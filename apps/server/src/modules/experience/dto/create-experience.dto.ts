@@ -1,0 +1,47 @@
+import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, IsUrl, IsUUID, MaxLength, Min } from 'class-validator';
+
+export class CreateExperienceDto {
+    @IsUUID()
+    sectionId!: string;
+
+    @IsUUID()
+    profileId!: string;
+
+    @IsString()
+    @MaxLength(255)
+    company!: string;
+
+    @IsString()
+    @MaxLength(255)
+    role!: string;
+
+    @IsDateString()
+    startDate!: string;
+
+    @IsDateString()
+    @IsOptional()
+    endDate?: string | null;
+
+    @IsString()
+    @IsOptional()
+    @MaxLength(255)
+    location?: string | null;
+
+    @IsString()
+    @IsOptional()
+    description?: string | null;
+
+    @IsUrl({ require_protocol: true })
+    @IsOptional()
+    @MaxLength(2048)
+    url?: string | null;
+
+    @IsInt()
+    @Min(0)
+    @IsOptional()
+    sortOrder?: number;
+
+    @IsBoolean()
+    @IsOptional()
+    visible?: boolean;
+}
