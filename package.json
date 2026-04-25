@@ -1,0 +1,24 @@
+{
+    "name": "@ninejuan/self-hosted-cv",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Self-hosted CV/portfolio platform inspired by ReadCV",
+    "author": "ninejuan",
+    "license": "MIT",
+    "workspaces": [
+        "apps/*"
+    ],
+    "scripts": {
+        "dev:server": "yarn workspace @ninejuan/cv-server start:dev",
+        "dev:web": "yarn workspace @ninejuan/cv-web dev",
+        "build:server": "yarn workspace @ninejuan/cv-server build",
+        "build:web": "yarn workspace @ninejuan/cv-web build",
+        "test:server": "yarn workspace @ninejuan/cv-server test",
+        "test:web": "yarn workspace @ninejuan/cv-web typecheck",
+        "lint": "yarn workspaces run lint",
+        "clean": "yarn workspaces run clean"
+    },
+    "engines": {
+        "node": ">=22.0.0"
+    }
+}
