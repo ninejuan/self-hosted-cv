@@ -12,6 +12,7 @@ import {
     ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DashboardData {
     profile?: { name: string; updatedAt?: string };
@@ -53,7 +54,17 @@ export default function AdminDashboard() {
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {SECTION_LINKS.map(({ to, label, icon: Icon }) => (
+                {data === null ? SECTION_LINKS.map(({ to }) => (
+                    <div key={to} className="rounded-xl border border-[var(--color-border)] px-4 py-3.5">
+                        <div className="flex items-center gap-3">
+                            <Skeleton className="size-9 rounded-lg" />
+                            <div className="flex-1">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="mt-2 h-3 w-16" />
+                            </div>
+                        </div>
+                    </div>
+                )) : SECTION_LINKS.map(({ to, label, icon: Icon }) => (
                     <Link
                         key={to}
                         to={to}
