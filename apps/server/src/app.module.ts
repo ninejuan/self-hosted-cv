@@ -1,10 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthGuard } from '@/common/guards/auth.guard';
+import { CacheInvalidationInterceptor } from '@/common/interceptors/cache-invalidation.interceptor';
 import { RequestIdMiddleware } from '@/common/middleware/request-id.middleware';
 import { databaseConfig } from '@/config/database.config';
 import { validateEnvironment } from '@/config/env.validation';
@@ -48,6 +51,8 @@ import { WritingModule } from '@/modules/writing/writing.module';
             load: [databaseConfig, redisConfig],
             validate: validateEnvironment,
         }),
+        CacheModule.register({ isGlobal: true }),
+        ScheduleModule.forRoot(),
         SequelizeModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -89,6 +94,10 @@ import { WritingModule } from '@/modules/writing/writing.module';
         {
             provide: APP_INTERCEPTOR,
             useClass: AuditInterceptor,
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: CacheInvalidationInterceptor,
         },
     ],
 })

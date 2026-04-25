@@ -3,9 +3,9 @@ import { adminFetch } from "@/lib/admin-api";
 import { SectionEditor } from "@/components/admin/section-editor";
 import { TextInput, DateInput } from "@/components/admin/form-fields";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Education } from "@/types/admin";
+import { AdminListSkeleton } from "@/components/ui/skeleton";
 
 export function meta() {
     return [{ title: "Education — Self-Hosted CV" }];
@@ -80,11 +80,7 @@ export default function EducationEditor() {
     }, []);
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <Loader2 className="size-5 animate-spin text-[var(--color-text-muted)]" />
-            </div>
-        );
+        return <AdminListSkeleton />;
     }
 
     return (

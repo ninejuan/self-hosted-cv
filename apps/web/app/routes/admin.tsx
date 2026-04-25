@@ -5,6 +5,8 @@ import { Sidebar, SidebarToggle } from "@/components/admin/sidebar";
 import { UpdateBanner } from "@/components/admin/update-banner";
 import { adminFetch, clearCsrfToken } from "@/lib/admin-api";
 import type { UpdateCheckResponse } from "@/types/admin";
+import { ErrorBoundaryView } from "@/components/error-boundary";
+import type { Route } from "./+types/admin";
 
 export function meta() {
     return [{ title: "Admin — Self-Hosted CV" }];
@@ -44,10 +46,11 @@ export default function AdminLayout() {
     if (authed === null) {
         return (
             <div
-                className="flex min-h-screen items-center justify-center"
+                className="flex min-h-screen items-center justify-center gap-3"
                 style={{ backgroundColor: "var(--color-bg)" }}
             >
                 <div className="size-6 animate-spin rounded-full border-2 border-[var(--color-border)] border-t-[var(--color-accent)]" />
+                <span className="text-[13px] text-[var(--color-text-muted)]">Loading admin…</span>
             </div>
         );
     }
@@ -94,4 +97,8 @@ export default function AdminLayout() {
             />
         </div>
     );
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+    return <ErrorBoundaryView error={error} title="Admin panel failed to load" />;
 }

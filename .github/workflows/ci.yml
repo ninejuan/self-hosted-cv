@@ -1,0 +1,73 @@
+name: CI
+
+on:
+    pull_request:
+        branches: [main]
+    push:
+        branches: [main]
+
+permissions:
+    contents: read
+
+jobs:
+    lint-and-typecheck:
+        name: Lint and typecheck
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: yarn
+            - run: yarn install --frozen-lockfile
+            - run: yarn lint
+            - run: yarn test:web
+
+    test-server:
+        name: Server tests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: yarn
+            - run: yarn install --frozen-lockfile
+            - run: yarn test:server
+
+    test-web:
+        name: Web typecheck
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: yarn
+            - run: yarn install --frozen-lockfile
+            - run: yarn test:web
+
+    build:
+        name: Build packages
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: yarn
+            - run: yarn install --frozen-lockfile
+            - run: yarn build:server
+            - run: yarn build:web
+
+    audit:
+        name: Dependency audit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: yarn
+            - run: yarn install --frozen-lockfile
+            - run: yarn audit

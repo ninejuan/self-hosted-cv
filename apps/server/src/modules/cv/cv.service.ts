@@ -1,5 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import Redis from 'ioredis';
 import { Order } from 'sequelize';
 
 import { SectionType } from '@/database/enums';
@@ -11,6 +13,8 @@ import { Profile } from '@/modules/profile/entities/profile.entity';
 import { Section } from '@/modules/section/entities/section.entity';
 import { Speaking } from '@/modules/speaking/entities/speaking.entity';
 import { Writing } from '@/modules/writing/entities/writing.entity';
+
+import { CV_CACHE_KEY, CV_CACHE_TTL_SECONDS } from './cv-cache.constants';
 
 interface CvSectionResponse {
     section: Section;
@@ -25,6 +29,7 @@ interface CvResponse {
 @Injectable()
 export class CvService {
     constructor(
+        @Inject(getRedisConnectionToken()) private readonly redis: Redis,
         @InjectModel(Profile) private readonly profileModel: typeof Profile,
         @InjectModel(Section) private readonly sectionModel: typeof Section,
         @InjectModel(WorkExperience) private readonly experienceModel: typeof WorkExperience,
@@ -36,6 +41,20 @@ export class CvService {
     ) {}
 
     async getCv(): Promise<CvResponse> {
+        const cached = await this.redis.get(CV_CACHE_KEY);
+
+        if (cached) {
+            return JSON.parse(cached) as CvResponse;
+        }
+
+        const cv = await this.buildCv();
+
+        await this.redis.set(CV_CACHE_KEY, JSON.stringify(cv), 'EX', CV_CACHE_TTL_SECONDS);
+
+        return cv;
+    }
+
+    private async buildCv(): Promise<CvResponse> {
         const profile = await this.profileModel.findOne({ order: [['createdAt', 'ASC']] });
 
         if (!profile) {

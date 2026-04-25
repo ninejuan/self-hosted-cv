@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AdminProfile } from "@/types/admin";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function meta() {
     return [{ title: "Profile — Self-Hosted CV" }];
@@ -57,8 +58,21 @@ export default function ProfileEditor() {
 
     if (!profile) {
         return (
-            <div className="flex items-center justify-center py-20">
-                <Loader2 className="size-5 animate-spin text-[var(--color-text-muted)]" />
+            <div>
+                <Skeleton className="h-7 w-28" />
+                <Skeleton className="mt-2 h-4 w-48" />
+                <div className="mt-6 flex flex-col gap-5">
+                    <Skeleton className="size-24 rounded-2xl" />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Skeleton className="h-11 w-full" />
+                        <Skeleton className="h-11 w-full" />
+                    </div>
+                    <Skeleton className="h-28 w-full" />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Skeleton className="h-11 w-full" />
+                        <Skeleton className="h-11 w-full" />
+                    </div>
+                </div>
             </div>
         );
     }

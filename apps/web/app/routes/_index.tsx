@@ -12,6 +12,7 @@ import { EducationSection } from "@/components/cv/education-section";
 import { ContactSection } from "@/components/cv/contact-section";
 import { ThemeToggle } from "@/components/cv/theme-toggle";
 import { PrintButton } from "@/components/cv/print-button";
+import { CvPageSkeleton } from "@/components/cv/cv-skeleton";
 
 export async function loader() {
     const cv = await fetchCV();
@@ -90,4 +91,8 @@ export default function Index() {
             </main>
         </>
     );
+}
+
+export function HydrateFallback() {
+    return <CvPageSkeleton />;
 }

@@ -7,7 +7,7 @@ export class AuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest<Request>();
         const path = request.originalUrl ?? request.url;
 
-        if (!path.startsWith('/api/admin')) {
+        if (!path.startsWith('/api/admin') && !path.startsWith('/api/auth/2fa')) {
             return true;
         }
 
