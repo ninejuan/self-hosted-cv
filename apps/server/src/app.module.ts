@@ -7,8 +7,20 @@ import { RequestIdMiddleware } from '@/common/middleware/request-id.middleware';
 import { databaseConfig } from '@/config/database.config';
 import { validateEnvironment } from '@/config/env.validation';
 import { redisConfig } from '@/config/redis.config';
+import { MigrationRunner } from '@/database/migration-runner';
 import { LoggerService } from '@/logger/logger.service';
+import { AuditLog } from '@/modules/audit/entities/audit-log.entity';
+import { SocialLink } from '@/modules/contact/entities/social-link.entity';
+import { Education } from '@/modules/education/entities/education.entity';
+import { WorkExperience } from '@/modules/experience/entities/work-experience.entity';
 import { HealthModule } from '@/modules/health/health.module';
+import { Media } from '@/modules/media/entities/media.entity';
+import { SideProject } from '@/modules/project/entities/side-project.entity';
+import { Profile } from '@/modules/profile/entities/profile.entity';
+import { Section } from '@/modules/section/entities/section.entity';
+import { AppSetting } from '@/modules/settings/entities/app-setting.entity';
+import { Speaking } from '@/modules/speaking/entities/speaking.entity';
+import { Writing } from '@/modules/writing/entities/writing.entity';
 
 @Module({
     imports: [
@@ -20,7 +32,10 @@ import { HealthModule } from '@/modules/health/health.module';
         SequelizeModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
-            useFactory: (configService: ConfigService) => configService.getOrThrow('database'),
+            useFactory: (configService: ConfigService) => ({
+                ...configService.getOrThrow('database'),
+                models: [Profile, Section, WorkExperience, Writing, Speaking, SideProject, Education, SocialLink, Media, AuditLog, AppSetting],
+            }),
         }),
         RedisModule.forRootAsync({
             imports: [ConfigModule],
@@ -29,7 +44,7 @@ import { HealthModule } from '@/modules/health/health.module';
         }),
         HealthModule,
     ],
-    providers: [LoggerService],
+    providers: [LoggerService, MigrationRunner],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer): void {
