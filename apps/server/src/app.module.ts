@@ -15,19 +15,31 @@ import { AuditInterceptor } from '@/modules/audit/audit.interceptor';
 import { AuditModule } from '@/modules/audit/audit.module';
 import { AuditLog } from '@/modules/audit/entities/audit-log.entity';
 import { AuthModule } from '@/modules/auth/auth.module';
+import { ContactModule } from '@/modules/contact/contact.module';
 import { SocialLink } from '@/modules/contact/entities/social-link.entity';
+import { CvModule } from '@/modules/cv/cv.module';
+import { EducationModule } from '@/modules/education/education.module';
 import { Education } from '@/modules/education/entities/education.entity';
+import { ExperienceModule } from '@/modules/experience/experience.module';
 import { WorkExperience } from '@/modules/experience/entities/work-experience.entity';
 import { HealthModule } from '@/modules/health/health.module';
+import { LinkedinModule } from '@/modules/linkedin/linkedin.module';
 import { Media } from '@/modules/media/entities/media.entity';
 import { MediaModule } from '@/modules/media/media.module';
 import { MinioModule } from '@/modules/minio/minio.module';
 import { SideProject } from '@/modules/project/entities/side-project.entity';
+import { ProjectModule } from '@/modules/project/project.module';
 import { Profile } from '@/modules/profile/entities/profile.entity';
+import { ProfileModule } from '@/modules/profile/profile.module';
 import { Section } from '@/modules/section/entities/section.entity';
+import { SectionModule } from '@/modules/section/section.module';
 import { AppSetting } from '@/modules/settings/entities/app-setting.entity';
+import { SettingsModule } from '@/modules/settings/settings.module';
 import { Speaking } from '@/modules/speaking/entities/speaking.entity';
+import { SpeakingModule } from '@/modules/speaking/speaking.module';
+import { UpdateCheckerModule } from '@/modules/update-checker/update-checker.module';
 import { Writing } from '@/modules/writing/entities/writing.entity';
+import { WritingModule } from '@/modules/writing/writing.module';
 
 @Module({
     imports: [
@@ -54,6 +66,18 @@ import { Writing } from '@/modules/writing/entities/writing.entity';
         MinioModule,
         MediaModule,
         HealthModule,
+        ProfileModule,
+        SectionModule,
+        ExperienceModule,
+        WritingModule,
+        SpeakingModule,
+        ProjectModule,
+        EducationModule,
+        ContactModule,
+        CvModule,
+        UpdateCheckerModule,
+        SettingsModule,
+        LinkedinModule,
     ],
     providers: [
         LoggerService,
