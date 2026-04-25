@@ -69,6 +69,58 @@ class EnvironmentVariables {
     @IsInt()
     @Min(0)
     REDIS_DB!: number;
+
+    @IsString()
+    @IsNotEmpty()
+    ADMIN_USERNAME!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    ADMIN_PASSWORD_HASH!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    SESSION_SECRET!: string;
+
+    @Transform(({ value }) => Number(value))
+    @IsInt()
+    @Min(1)
+    SESSION_IDLE_TIMEOUT!: number;
+
+    @Transform(({ value }) => Number(value))
+    @IsInt()
+    @Min(1)
+    SESSION_MAX_LIFETIME!: number;
+
+    @Transform(({ value }) => Number(value))
+    @IsInt()
+    @Min(1)
+    LOGIN_MAX_ATTEMPTS!: number;
+
+    @Transform(({ value }) => Number(value))
+    @IsInt()
+    @Min(1)
+    LOGIN_LOCKOUT_DURATION!: number;
+
+    @IsString()
+    @IsNotEmpty()
+    MINIO_INTERNAL_ENDPOINT!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    MINIO_PUBLIC_ENDPOINT!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    MINIO_ACCESS_KEY!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    MINIO_SECRET_KEY!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    MINIO_BUCKET!: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {
