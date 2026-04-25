@@ -44,3 +44,160 @@ body {
     color: var(--color-text-primary);
     font-family: var(--font-primary);
 }
+
+/* ── CV Page Layout ── */
+
+.cv-page {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 22px 80px;
+}
+
+@media (min-width: 730px) {
+    .cv-page {
+        padding: 62px 62px 100px;
+    }
+}
+
+/* ── Toolbar (theme toggle + print) ── */
+
+.cv-toolbar {
+    position: absolute;
+    top: 16px;
+    right: 22px;
+    display: flex;
+    gap: 4px;
+}
+
+@media (min-width: 730px) {
+    .cv-toolbar {
+        right: 62px;
+    }
+}
+
+/* ── Section Styles ── */
+
+.cv-section {
+    margin-top: 55px;
+}
+
+.cv-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 20px;
+}
+
+.cv-section-items {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ── Item Row (date | content) ── */
+
+.cv-item-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cv-date-column {
+    flex-shrink: 0;
+    width: auto;
+    padding-top: 2px;
+}
+
+.cv-content-column {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (min-width: 730px) {
+    .cv-item-row {
+        flex-direction: row;
+        gap: 0;
+    }
+
+    .cv-date-column {
+        width: 130px;
+    }
+}
+
+/* ── Print Stylesheet ── */
+
+@media print {
+    *,
+    *::before,
+    *::after {
+        color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+        color: #111 !important;
+        font-size: 10pt;
+        line-height: 1.5;
+    }
+
+    .cv-page {
+        max-width: none;
+        padding: 0;
+        margin: 15mm 20mm;
+    }
+
+    .cv-toolbar {
+        display: none !important;
+    }
+
+    .cv-section {
+        margin-top: 32px;
+        break-inside: avoid;
+    }
+
+    .cv-section-title {
+        font-size: 9pt;
+        margin-bottom: 12px;
+    }
+
+    .cv-section-items {
+        gap: 14px;
+    }
+
+    .cv-item-row {
+        flex-direction: row;
+        gap: 0;
+        break-inside: avoid;
+    }
+
+    .cv-date-column {
+        width: 110px;
+    }
+
+    a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 8pt;
+        color: #666;
+        word-break: break-all;
+    }
+
+    a[href^="#"]::after,
+    a[href^="javascript:"]::after {
+        content: "";
+    }
+
+    img {
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+}
