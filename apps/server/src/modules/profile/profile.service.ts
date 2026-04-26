@@ -6,23 +6,27 @@ import { Profile } from './entities/profile.entity';
 
 @Injectable()
 export class ProfileService {
-    constructor(@InjectModel(Profile) private readonly profileModel: typeof Profile) {}
+  constructor(
+    @InjectModel(Profile) private readonly profileModel: typeof Profile,
+  ) {}
 
-    async getProfile(): Promise<Profile> {
-        const profile = await this.profileModel.findOne({ order: [['createdAt', 'ASC']] });
+  async getProfile(): Promise<Profile> {
+    const profile = await this.profileModel.findOne({
+      order: [['createdAt', 'ASC']],
+    });
 
-        if (!profile) {
-            throw new NotFoundException('Profile not found');
-        }
-
-        return profile;
+    if (!profile) {
+      throw new NotFoundException('Profile not found');
     }
 
-    async updateProfile(dto: UpdateProfileDto): Promise<Profile> {
-        const profile = await this.getProfile();
+    return profile;
+  }
 
-        await profile.update(dto);
+  async updateProfile(dto: UpdateProfileDto): Promise<Profile> {
+    const profile = await this.getProfile();
 
-        return profile;
-    }
+    await profile.update(dto);
+
+    return profile;
+  }
 }

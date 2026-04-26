@@ -6,9 +6,9 @@ import { ExperienceController } from './experience.controller';
 import { ExperienceService } from './experience.service';
 
 @Module({
-    imports: [SequelizeModule.forFeature([WorkExperience])],
-    controllers: [ExperienceController],
-    providers: [ExperienceService],
-    exports: [ExperienceService],
+  imports: [SequelizeModule.forFeature([WorkExperience])],
+  controllers: [ExperienceController],
+  providers: [ExperienceService],
+  exports: [ExperienceService],
 })
 export class ExperienceModule {}

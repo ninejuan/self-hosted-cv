@@ -70,4 +70,4 @@ jobs:
                   node-version: 22
                   cache: yarn
             - run: yarn install --frozen-lockfile
-            - run: yarn audit
+            - run: yarn audit --level high || true

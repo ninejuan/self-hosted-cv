@@ -4,10 +4,10 @@ import { CvService } from './cv.service';
 
 @Controller('cv')
 export class CvController {
-    constructor(private readonly cvService: CvService) {}
+  constructor(private readonly cvService: CvService) {}
 
-    @Get()
-    getCv(): ReturnType<CvService['getCv']> {
-        return this.cvService.getCv();
-    }
+  @Get()
+  getCv(): ReturnType<CvService['getCv']> {
+    return this.cvService.getCv();
+  }
 }

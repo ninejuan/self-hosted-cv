@@ -8,5 +8,9 @@ import { Profile } from '@/modules/profile/entities/profile.entity';
 import { LinkedinController } from './linkedin.controller';
 import { LinkedinService } from './linkedin.service';
 
-@Module({ imports: [SequelizeModule.forFeature([Profile, WorkExperience, Education])], controllers: [LinkedinController], providers: [LinkedinService] })
+@Module({
+  imports: [SequelizeModule.forFeature([Profile, WorkExperience, Education])],
+  controllers: [LinkedinController],
+  providers: [LinkedinService],
+})
 export class LinkedinModule {}

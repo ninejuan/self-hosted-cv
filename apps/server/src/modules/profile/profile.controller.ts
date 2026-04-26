@@ -6,15 +6,15 @@ import { ProfileService } from './profile.service';
 
 @Controller('admin/profile')
 export class ProfileController {
-    constructor(private readonly profileService: ProfileService) {}
+  constructor(private readonly profileService: ProfileService) {}
 
-    @Get()
-    getProfile(): Promise<Profile> {
-        return this.profileService.getProfile();
-    }
+  @Get()
+  getProfile(): Promise<Profile> {
+    return this.profileService.getProfile();
+  }
 
-    @Put()
-    updateProfile(@Body() dto: UpdateProfileDto): Promise<Profile> {
-        return this.profileService.updateProfile(dto);
-    }
+  @Put()
+  updateProfile(@Body() dto: UpdateProfileDto): Promise<Profile> {
+    return this.profileService.updateProfile(dto);
+  }
 }
