@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -16,7 +16,15 @@ export class ProfileService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Profile not found');
+      return this.profileModel.create({
+        name: '',
+        profession: '',
+        location: '',
+        bio: '',
+        slug: 'my-cv',
+        status: 'none',
+        theme: 'system',
+      });
     }
 
     return profile;

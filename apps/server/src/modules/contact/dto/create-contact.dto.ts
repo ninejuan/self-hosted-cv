@@ -14,7 +14,8 @@ import { SocialPlatform } from '@/database/enums';
 
 export class CreateContactDto {
   @IsUUID()
-  profileId!: string;
+  @IsOptional()
+  profileId?: string;
 
   @IsEnum(SocialPlatform)
   platform!: SocialPlatform;
@@ -23,7 +24,7 @@ export class CreateContactDto {
   @MaxLength(255)
   username!: string;
 
-  @IsUrl({ require_protocol: true })
+  @IsUrl({ require_protocol: true, require_tld: false })
   @MaxLength(2048)
   url!: string;
 

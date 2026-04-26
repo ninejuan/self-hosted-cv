@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/admin-api";
 import { SectionEditor } from "@/components/admin/section-editor";
+import { MultiImageUploader } from "@/components/admin/multi-image-uploader";
 import { TextInput, TextArea, DateInput } from "@/components/admin/form-fields";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ function ExperienceForm({
         startDate: item?.startDate ?? "",
         endDate: item?.endDate ?? "",
         description: item?.description ?? "",
+        images: (item as unknown as Record<string, unknown>)?.images as string[] ?? [],
     });
 
     function set(field: string, value: string) {
@@ -58,6 +60,12 @@ function ExperienceForm({
                 <DateInput label="End Date" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} />
             </div>
             <TextArea label="Description" value={form.description} onChange={(e) => set("description", e.target.value)} rows={4} />
+            <MultiImageUploader
+                images={form.images}
+                onChange={(urls) => setForm((prev) => ({ ...prev, images: urls }))}
+                purpose="experience"
+                maxImages={5}
+            />
             <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={onCancel} className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[13px] font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-tag-bg)]">
                     Cancel
@@ -75,7 +83,7 @@ export default function ExperienceEditor() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        adminFetch<WorkExperience[]>("/api/admin/experience")
+        adminFetch<WorkExperience[]>("/api/admin/experiences")
             .then(setItems)
             .catch(() => toast.error("Failed to load experience"))
             .finally(() => setLoading(false));
@@ -88,7 +96,7 @@ export default function ExperienceEditor() {
     return (
         <SectionEditor<WorkExperience>
             title="Experience"
-            apiPath="/api/admin/experience"
+            apiPath="/api/admin/experiences"
             items={items}
             onItemsChange={setItems}
             createEmpty={() => ({ role: "", company: "", startDate: "" } as Omit<WorkExperience, "id">)}

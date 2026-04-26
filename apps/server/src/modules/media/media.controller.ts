@@ -21,7 +21,7 @@ export class MediaController {
   @Post('presign')
   presign(
     @Body() dto: PresignMediaDto,
-  ): Promise<{ uploadUrl: string; objectKey: string; media: Media }> {
+  ): Promise<{ upload_url: string; key: string; file_url: string }> {
     return this.mediaService.presign(dto);
   }
 

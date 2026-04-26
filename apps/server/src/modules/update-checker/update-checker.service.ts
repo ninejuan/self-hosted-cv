@@ -131,7 +131,7 @@ export class UpdateCheckerService {
 
   private async getCurrentVersion(): Promise<string> {
     const packageJson = JSON.parse(
-      await readFile(join(process.cwd(), 'apps/server/package.json'), 'utf8'),
+      await readFile(join(__dirname, '..', '..', '..', 'package.json'), 'utf8'),
     ) as { version?: string };
 
     return packageJson.version ?? '0.0.0';

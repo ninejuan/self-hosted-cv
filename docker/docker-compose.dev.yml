@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-47532}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-cv_user} -d $${POSTGRES_DB:-cv}"]
       interval: 10s
@@ -29,7 +29,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${REDIS_PORT:-47379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -48,14 +48,15 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin123}
+      MINIO_SERVER_URL: http://localhost:${MINIO_PORT:-47900}
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_PORT:-47900}:9000"
+      - "${MINIO_CONSOLE_PORT:-47901}:9001"
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -73,18 +74,19 @@ services:
         required: false
     environment:
       NODE_ENV: development
-      APP_PORT: ${APP_PORT:-3000}
+      APP_PORT: 3000
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
       MINIO_INTERNAL_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_ENDPOINT: http://localhost:${MINIO_PORT:-47900}
       API_INTERNAL_URL: http://server:3000
     volumes:
       - ../apps/server/src:/app/apps/server/src
       - ../apps/server/test:/app/apps/server/test
     ports:
-      - "${APP_PORT:-3000}:3000"
+      - "${APP_PORT:-47300}:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -93,7 +95,7 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -111,18 +113,17 @@ services:
         required: false
     environment:
       NODE_ENV: development
-      APP_PORT: ${APP_PORT:-3000}
-      VITE_API_URL: /api
+      VITE_API_URL: ""
       API_INTERNAL_URL: http://server:3000
     volumes:
       - ../apps/web/app:/app/apps/web/app
       - ../apps/web/public:/app/apps/web/public
     ports:
-      - "5173:3000"
+      - "${WEB_PORT:-47173}:5173"
     depends_on:
       - server
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5173/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

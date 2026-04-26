@@ -20,9 +20,12 @@ export async function loader() {
 }
 
 export function meta({ loaderData }: Route.MetaArgs) {
-    const cv = (loaderData as { cv: CVData } | undefined)?.cv;
+    const cv = (loaderData as { cv: CVData | null } | undefined)?.cv;
     if (!cv) {
-        return [{ title: "Self-Hosted CV" }];
+        return [
+            { title: "Self-Hosted CV — Setup" },
+            { name: "description", content: "Set up your self-hosted CV" },
+        ];
     }
 
     const { profile } = cv;
@@ -68,8 +71,80 @@ function JsonLd({ cv }: { cv: CVData }) {
     );
 }
 
+function WelcomePage() {
+    return (
+        <main className="cv-page">
+            <div className="cv-toolbar">
+                <ThemeToggle />
+            </div>
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "60vh",
+                gap: "24px",
+                textAlign: "center",
+            }}>
+                <div style={{
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "50%",
+                    background: "var(--color-accent)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "28px",
+                }}>
+                    👋
+                </div>
+                <h1 style={{
+                    fontSize: "20px",
+                    fontWeight: 700,
+                    color: "var(--color-text-primary)",
+                    lineHeight: "26px",
+                    margin: 0,
+                }}>
+                    Welcome to Self-Hosted CV
+                </h1>
+                <p style={{
+                    fontSize: "14px",
+                    lineHeight: 1.8,
+                    color: "var(--color-text-secondary)",
+                    maxWidth: "400px",
+                    margin: 0,
+                }}>
+                    Your CV is not set up yet. Head to the admin dashboard to create your profile and start building your portfolio.
+                </p>
+                <a
+                    href="/admin"
+                    style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "10px 24px",
+                        borderRadius: "12px",
+                        background: "var(--color-accent)",
+                        color: "#052D0A",
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        textDecoration: "none",
+                        transition: "opacity 0.15s ease-in-out",
+                    }}
+                >
+                    Go to Admin Dashboard →
+                </a>
+            </div>
+        </main>
+    );
+}
+
 export default function Index() {
     const { cv } = useLoaderData<typeof loader>();
+
+    if (!cv) {
+        return <WelcomePage />;
+    }
 
     return (
         <>
@@ -81,13 +156,15 @@ export default function Index() {
                 </div>
 
                 <Header profile={cv.profile} />
-                <About bio={cv.profile.bio} />
-                <ExperienceSection items={cv.experience} />
-                <WritingSection items={cv.writing} />
-                <SpeakingSection items={cv.speaking} />
-                <ProjectsSection items={cv.projects} />
-                <EducationSection items={cv.education} />
-                <ContactSection links={cv.profile.socialLinks} />
+                <div className="cv-main">
+                    <About bio={cv.profile.bio} />
+                    <ExperienceSection items={cv.experience} />
+                    <WritingSection items={cv.writing} />
+                    <SpeakingSection items={cv.speaking} />
+                    <ProjectsSection items={cv.projects} />
+                    <EducationSection items={cv.education} />
+                    <ContactSection links={cv.profile.socialLinks} />
+                </div>
             </main>
         </>
     );

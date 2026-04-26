@@ -1,6 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { getConnectionToken } from '@nestjs/sequelize';
+import { Inject } from '@nestjs/common';
+
+import { SectionType } from '@/database/enums';
+import { Profile } from '@/modules/profile/entities/profile.entity';
+import { Section } from '@/modules/section/entities/section.entity';
 
 import { CreateContactDto } from './dto/create-contact.dto';
 import { ReorderDto } from './dto/reorder.dto';
@@ -12,7 +18,9 @@ export class ContactService {
   constructor(
     @InjectModel(SocialLink)
     private readonly socialLinkModel: typeof SocialLink,
-    private readonly sequelize: Sequelize,
+    @InjectModel(Profile) private readonly profileModel: typeof Profile,
+    @InjectModel(Section) private readonly sectionModel: typeof Section,
+    @Inject(getConnectionToken()) private readonly sequelize: Sequelize,
   ) {}
 
   findAll(): Promise<SocialLink[]> {
@@ -24,9 +32,37 @@ export class ContactService {
     });
   }
 
-  create(dto: CreateContactDto): Promise<SocialLink> {
+  async create(dto: CreateContactDto): Promise<SocialLink> {
+    let profileId = dto.profileId;
+
+    if (!profileId) {
+      const profile = await this.profileModel.findOne({
+        order: [['createdAt', 'ASC']],
+      });
+      if (!profile)
+        throw new NotFoundException(
+          'No profile found. Create a profile first.',
+        );
+      profileId = profile.id;
+    }
+
+    const existingSection = await this.sectionModel.findOne({
+      where: { profileId, type: SectionType.Contact },
+    });
+
+    if (!existingSection) {
+      await this.sectionModel.create({
+        profileId,
+        type: SectionType.Contact,
+        title: 'Contact',
+        sortOrder: 99,
+        visible: true,
+      });
+    }
+
     return this.socialLinkModel.create({
       ...dto,
+      profileId,
       sortOrder: dto.sortOrder ?? 0,
       visible: dto.visible ?? true,
     });

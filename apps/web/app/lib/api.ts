@@ -1,5 +1,15 @@
 import type { CVData } from "@/types/cv";
 
+type ServerSection = {
+    section?: { type?: string };
+    items?: Array<Record<string, unknown>>;
+};
+
+type ServerCVResponse = {
+    profile?: Record<string, unknown> | null;
+    sections?: ServerSection[];
+};
+
 function getBaseUrl(isServer: boolean): string {
     if (isServer) {
         return process.env.API_INTERNAL_URL ?? "http://localhost:3000";
@@ -7,17 +17,121 @@ function getBaseUrl(isServer: boolean): string {
     return import.meta.env.VITE_API_URL ?? "";
 }
 
-export async function fetchCV(): Promise<CVData> {
+export async function fetchCV(): Promise<CVData | null> {
     const isServer = typeof window === "undefined";
     const baseUrl = getBaseUrl(isServer);
 
-    const res = await fetch(`${baseUrl}/api/cv`, {
-        headers: { Accept: "application/json" },
-    });
+    try {
+        const res = await fetch(`${baseUrl}/api/cv`, {
+            headers: { Accept: "application/json" },
+        });
 
-    if (!res.ok) {
-        throw new Response("Failed to fetch CV data", { status: res.status });
+        if (res.status === 404) {
+            return null;
+        }
+
+        if (!res.ok) {
+            return null;
+        }
+
+        const data = await res.json() as ServerCVResponse;
+        if (!data?.profile) {
+            return null;
+        }
+
+        return normalizeCV(data);
+    } catch {
+        return null;
     }
+}
 
-    return res.json();
+function normalizeCV(data: ServerCVResponse): CVData {
+    const profile = data.profile ?? {};
+    const sections = data.sections ?? [];
+
+    return {
+        profile: {
+            name: stringValue(profile.name),
+            profession: stringValue(profile.profession),
+            location: stringValue(profile.location),
+            bio: stringValue(profile.bio),
+            avatarUrl: optionalString(profile.avatarUrl),
+            websiteUrl: optionalString(profile.website),
+            websiteLabel: optionalString(profile.website)?.replace(/^https?:\/\//, ""),
+            socialLinks: sectionItems(sections, "contact").map((item) => ({
+                platform: stringValue(item.platform),
+                url: stringValue(item.url),
+                username: stringValue(item.username),
+            })),
+        },
+        experience: sectionItems(sections, "work_experience").map((item) => ({
+            id: stringValue(item.id),
+            role: stringValue(item.role),
+            company: stringValue(item.company),
+            companyUrl: optionalString(item.url),
+            location: optionalString(item.location),
+            startDate: stringValue(item.startDate),
+            endDate: optionalString(item.endDate),
+            description: optionalString(item.description),
+            media: Array.isArray(item.media) ? (item.media as Array<Record<string, unknown>>).map((m) => ({
+                url: stringValue(m.url),
+                alt: optionalString(m.alt),
+            })) : [],
+        })),
+        writing: sectionItems(sections, "writing").map((item) => ({
+            id: stringValue(item.id),
+            title: stringValue(item.title),
+            url: optionalString(item.url),
+            date: stringValue(item.publishedDate),
+            collaborators: optionalString(item.collaborators),
+            description: optionalString(item.description),
+            readTime: optionalString(item.readTime),
+            thumbnail: optionalString(item.thumbnailUrl)
+                ? { url: stringValue(item.thumbnailUrl), alt: stringValue(item.title) }
+                : undefined,
+        })),
+        speaking: sectionItems(sections, "speaking").map((item) => ({
+            id: stringValue(item.id),
+            title: stringValue(item.title),
+            url: optionalString(item.url),
+            location: optionalString(item.location),
+            date: stringValue(item.date),
+            media: Array.isArray(item.media) ? (item.media as Array<Record<string, unknown>>).map((m) => ({
+                url: stringValue(m.url),
+                alt: optionalString(m.alt),
+            })) : [],
+        })),
+        projects: sectionItems(sections, "side_project").map((item) => ({
+            id: stringValue(item.id),
+            name: stringValue(item.name),
+            url: optionalString(item.url),
+            description: optionalString(item.description),
+            startDate: stringValue(item.date),
+            media: Array.isArray(item.media) ? (item.media as Array<Record<string, unknown>>).map((m) => ({
+                url: stringValue(m.url),
+                alt: optionalString(m.alt),
+            })) : [],
+        })),
+        education: sectionItems(sections, "education").map((item) => ({
+            id: stringValue(item.id),
+            degree: stringValue(item.degree),
+            institution: stringValue(item.institution),
+            institutionUrl: optionalString(item.url),
+            location: optionalString(item.location),
+            startDate: stringValue(item.startDate),
+            endDate: optionalString(item.endDate),
+        })),
+    };
+}
+
+function sectionItems(sections: ServerSection[], type: string): Array<Record<string, unknown>> {
+    return sections.find((entry) => entry.section?.type === type)?.items ?? [];
+}
+
+function stringValue(value: unknown): string {
+    return typeof value === "string" ? value : "";
+}
+
+function optionalString(value: unknown): string | undefined {
+    return typeof value === "string" && value.length > 0 ? value : undefined;
 }

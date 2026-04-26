@@ -1,16 +1,16 @@
 import { randomBytes } from 'node:crypto';
 import { IncomingMessage } from 'node:http';
 
-import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
 import { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
 import Redis from 'ioredis';
-import { RedisStore } from 'connect-redis';
+import RedisStore from 'connect-redis';
 
 import { HttpExceptionFilter } from '@/common/filters/http-exception.filter';
 import { LoggingInterceptor } from '@/common/interceptors/logging.interceptor';
@@ -25,8 +25,13 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
   const logger = app.get(LoggerService);
-  const redisClient = app.get<Redis>(getRedisConnectionToken());
   const cspNonces = new WeakMap<IncomingMessage, string>();
+
+  const sessionRedis = new Redis({
+    host: configService.get<string>('REDIS_HOST', 'localhost'),
+    port: Number(configService.get('REDIS_PORT', 6379)),
+    password: configService.get<string>('REDIS_PASSWORD') || undefined,
+  });
 
   app.useLogger(logger);
   app.use((request: Request, _response: Response, next: NextFunction) => {
@@ -66,18 +71,21 @@ async function bootstrap() {
       saveUninitialized: false,
       rolling: true,
       store: new RedisStore({
-        client: redisClient,
+        client: sessionRedis,
         prefix: 'cv:sess:',
-        ttl: configService.getOrThrow<number>('SESSION_MAX_LIFETIME'),
+        ttl: Number(configService.get('SESSION_MAX_LIFETIME', 86400)),
       }),
       cookie: {
         httpOnly: true,
-        secure: configService.getOrThrow<string>('NODE_ENV') === 'production',
+        secure: configService.get<string>('NODE_ENV') === 'production',
         sameSite: 'lax',
-        maxAge: configService.getOrThrow<number>('SESSION_MAX_LIFETIME') * 1000,
+        maxAge:
+          Number(configService.get('SESSION_MAX_LIFETIME', 86400)) * 1000,
       },
     }),
   );
+  app.use(cookieParser());
+  const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
   app.use((request: Request, response: Response, next: NextFunction) => {
     const path = request.originalUrl ?? request.url;
     const isLogin =
@@ -89,7 +97,7 @@ async function bootstrap() {
     );
 
     if ((isMutating && !isLogin) || isCsrfToken) {
-      csurf()(request, response, next);
+      csrfProtection(request, response, next);
       return;
     }
 
@@ -100,7 +108,6 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
-      forbidNonWhitelisted: true,
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter(logger));
@@ -118,6 +125,6 @@ async function bootstrap() {
     process.exit(1);
   }
 
-  await app.listen(configService.getOrThrow<number>('PORT'));
+  await app.listen(configService.get<number>('APP_PORT') ?? 3000);
 }
 void bootstrap();

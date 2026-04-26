@@ -9,19 +9,23 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateProjectDto {
   @IsUUID()
-  sectionId!: string;
+  @IsOptional()
+  sectionId?: string;
 
   @IsUUID()
-  profileId!: string;
+  @IsOptional()
+  profileId?: string;
 
   @IsString()
   @MaxLength(255)
   name!: string;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   url?: string | null;

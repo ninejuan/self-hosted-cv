@@ -4,20 +4,82 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    useRouteLoaderData,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import { ErrorBoundaryView } from "@/components/error-boundary";
 import "./app.css";
 
-export const meta: Route.MetaFunction = () => [
-    { title: "Self-Hosted CV" },
-    { name: "description", content: "Self-hosted CV/portfolio platform inspired by ReadCV" },
-    { name: "theme-color", content: "#A8E765" },
-    { property: "og:title", content: "Self-Hosted CV" },
-    { property: "og:description", content: "Self-hosted CV/portfolio platform inspired by ReadCV" },
-    { property: "og:type", content: "website" },
-];
+export async function loader() {
+    const isServer = typeof window === "undefined";
+    const baseUrl = isServer
+        ? (process.env.API_INTERNAL_URL ?? "http://localhost:47300")
+        : "";
+
+    try {
+        const res = await fetch(`${baseUrl}/api/site-settings`, {
+            headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return { site: null };
+        const site = await res.json();
+        return { site };
+    } catch {
+        return { site: null };
+    }
+}
+
+interface SiteSettings {
+    siteTitle?: string;
+    siteDescription?: string;
+    faviconUrl?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImageUrl?: string;
+    themeColor?: string;
+    googleAnalyticsId?: string;
+    customHeadScripts?: string;
+    customCss?: string;
+}
+
+export const meta: Route.MetaFunction = ({ data }) => {
+    const site = (data as { site?: SiteSettings } | undefined)?.site;
+    const title = site?.siteTitle || "Self-Hosted CV";
+    const description = site?.siteDescription || "Self-hosted CV/portfolio platform";
+    const ogTitle = site?.ogTitle || title;
+    const ogDescription = site?.ogDescription || description;
+    const themeColor = site?.themeColor || "#A8E765";
+
+    return [
+        { title },
+        { name: "description", content: description },
+        { name: "theme-color", content: themeColor },
+        { property: "og:title", content: ogTitle },
+        { property: "og:description", content: ogDescription },
+        { property: "og:type", content: "website" },
+        ...(site?.ogImageUrl ? [{ property: "og:image", content: site.ogImageUrl }] : []),
+    ];
+};
+
+function SiteHead() {
+    const data = useRouteLoaderData("root") as { site?: SiteSettings } | undefined;
+    const site = data?.site;
+    if (!site) return null;
+
+    return (
+        <>
+            {site.faviconUrl && <link rel="icon" type="image/png" href={site.faviconUrl} />}
+            {site.customCss && <style dangerouslySetInnerHTML={{ __html: site.customCss }} />}
+            {site.googleAnalyticsId && (
+                <>
+                    <script async src={`https://www.googletagmanager.com/gtag/js?id=${site.googleAnalyticsId}`} />
+                    <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${site.googleAnalyticsId}');` }} />
+                </>
+            )}
+            {site.customHeadScripts && <script dangerouslySetInnerHTML={{ __html: site.customHeadScripts }} />}
+        </>
+    );
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -25,6 +87,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <SiteHead />
                 <Meta />
                 <Links />
                 <script

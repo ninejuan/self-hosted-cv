@@ -9,6 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateWritingDto {
   @IsUUID()
@@ -24,7 +25,8 @@ export class UpdateWritingDto {
   @IsOptional()
   title?: string;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   url?: string | null;
@@ -34,7 +36,8 @@ export class UpdateWritingDto {
   @MaxLength(255)
   collaborators?: string | null;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   thumbnailUrl?: string | null;

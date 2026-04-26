@@ -40,8 +40,8 @@ export default function AuditLogViewer() {
             if (dateTo) params.set("to", dateTo);
 
             const data = await adminFetch<AuditLogResponse>(`/api/admin/audit-logs?${params}`);
-            setEntries(data.data);
-            setTotal(data.total);
+            setEntries(data.items ?? []);
+            setTotal(data.total ?? 0);
         } catch {
             toast.error("Failed to load audit logs");
         } finally {
@@ -118,15 +118,15 @@ export default function AuditLogViewer() {
                             entries.map((entry) => (
                                 <tr key={entry.id} className="border-b border-[var(--color-border)] last:border-0">
                                     <td className="whitespace-nowrap px-4 py-2.5 font-mono text-[12px] text-[var(--color-text-secondary)]">
-                                        {formatTimestamp(entry.created_at)}
+                                        {formatTimestamp(entry.createdAt)}
                                     </td>
                                     <td className="px-4 py-2.5">
                                         <span className="inline-block rounded-md bg-[var(--color-tag-bg)] px-2 py-0.5 text-[12px] font-medium text-[var(--color-text-primary)]">
                                             {entry.action}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-2.5 text-[var(--color-text-secondary)]">{entry.entity_type}</td>
-                                    <td className="px-4 py-2.5 font-mono text-[12px] text-[var(--color-text-muted)]">{entry.entity_id ?? "—"}</td>
+                                    <td className="px-4 py-2.5 text-[var(--color-text-secondary)]">{entry.entityType}</td>
+                                    <td className="px-4 py-2.5 font-mono text-[12px] text-[var(--color-text-muted)]">{entry.entityId ?? "—"}</td>
                                     <td className="px-4 py-2.5 font-mono text-[12px] text-[var(--color-text-muted)]">{entry.ip}</td>
                                 </tr>
                             ))

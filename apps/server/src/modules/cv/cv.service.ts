@@ -1,5 +1,5 @@
 import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import Redis from 'ioredis';
 import { Order } from 'sequelize';
@@ -8,6 +8,7 @@ import { SectionType } from '@/database/enums';
 import { SocialLink } from '@/modules/contact/entities/social-link.entity';
 import { Education } from '@/modules/education/entities/education.entity';
 import { WorkExperience } from '@/modules/experience/entities/work-experience.entity';
+import { Media } from '@/modules/media/entities/media.entity';
 import { SideProject } from '@/modules/project/entities/side-project.entity';
 import { Profile } from '@/modules/profile/entities/profile.entity';
 import { Section } from '@/modules/section/entities/section.entity';
@@ -42,9 +43,10 @@ export class CvService {
     @InjectModel(Education) private readonly educationModel: typeof Education,
     @InjectModel(SocialLink)
     private readonly socialLinkModel: typeof SocialLink,
+    @InjectModel(Media) private readonly mediaModel: typeof Media,
   ) {}
 
-  async getCv(): Promise<CvResponse> {
+  async getCv(): Promise<CvResponse | null> {
     const cached = await this.redis.get(CV_CACHE_KEY);
 
     if (cached) {
@@ -53,23 +55,25 @@ export class CvService {
 
     const cv = await this.buildCv();
 
-    await this.redis.set(
-      CV_CACHE_KEY,
-      JSON.stringify(cv),
-      'EX',
-      CV_CACHE_TTL_SECONDS,
-    );
+    if (cv) {
+      await this.redis.set(
+        CV_CACHE_KEY,
+        JSON.stringify(cv),
+        'EX',
+        CV_CACHE_TTL_SECONDS,
+      );
+    }
 
     return cv;
   }
 
-  private async buildCv(): Promise<CvResponse> {
+  private async buildCv(): Promise<CvResponse | null> {
     const profile = await this.profileModel.findOne({
       order: [['createdAt', 'ASC']],
     });
 
     if (!profile) {
-      throw new NotFoundException('Profile not found');
+      return null;
     }
 
     const sections = await this.sectionModel.findAll({
@@ -90,7 +94,7 @@ export class CvService {
     return { profile, sections: sectionResponses };
   }
 
-  private getSectionItems(
+  private async getSectionItems(
     profileId: string,
     section: Section,
   ): Promise<CvSectionResponse['items']> {
@@ -105,17 +109,46 @@ export class CvService {
 
     switch (section.type) {
       case SectionType.WorkExperience:
-        return this.experienceModel.findAll({ where, order });
+        return this.withMedia(
+          await this.experienceModel.findAll({ where, order }),
+          'experience',
+        );
       case SectionType.Writing:
         return this.writingModel.findAll({ where, order });
       case SectionType.Speaking:
-        return this.speakingModel.findAll({ where, order });
+        return this.withMedia(
+          await this.speakingModel.findAll({ where, order }),
+          'speaking',
+        );
       case SectionType.SideProject:
-        return this.projectModel.findAll({ where, order });
+        return this.withMedia(
+          await this.projectModel.findAll({ where, order }),
+          'side_project',
+        );
       case SectionType.Education:
         return this.educationModel.findAll({ where, order });
       case SectionType.Contact:
         return this.socialLinkModel.findAll({ where, order });
     }
+  }
+
+  private async withMedia<T extends { id: string; toJSON: () => Record<string, unknown> }>(
+    items: T[],
+    entityType: string,
+  ): Promise<T[]> {
+    const ids = items.map((i) => i.id);
+    const media = ids.length
+      ? await this.mediaModel.findAll({
+          where: { entityType, entityId: ids, status: 'attached' },
+          order: [['sortOrder', 'ASC']],
+        })
+      : [];
+    return items.map((item) => {
+      const json = item.toJSON();
+      json.media = media
+        .filter((m) => m.entityId === item.id)
+        .map((m) => ({ url: m.publicUrl, alt: m.altText }));
+      return json as unknown as T;
+    });
   }
 }

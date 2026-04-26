@@ -19,16 +19,16 @@ export interface SectionConfig {
 export interface AuditLogEntry {
     id: string;
     action: string;
-    entity_type: string;
-    entity_id?: string;
+    entityType: string;
+    entityId?: string;
     ip: string;
-    user_agent?: string;
+    userAgent?: string;
     details?: Record<string, unknown>;
-    created_at: string;
+    createdAt: string;
 }
 
 export interface AuditLogResponse {
-    data: AuditLogEntry[];
+    items: AuditLogEntry[];
     total: number;
     page: number;
     limit: number;

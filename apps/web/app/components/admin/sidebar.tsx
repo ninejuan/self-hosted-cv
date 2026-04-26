@@ -52,7 +52,7 @@ export function Sidebar({ open, onClose, onLogout }: SidebarProps) {
 
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r bg-[var(--color-bg)] transition-transform duration-200 lg:static lg:translate-x-0",
+                    "fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r bg-[var(--color-bg)] transition-transform duration-200 lg:translate-x-0",
                     "border-[var(--color-border)]",
                     open ? "translate-x-0" : "-translate-x-full",
                 )}

@@ -1,14 +1,11 @@
-import { cn } from "@/lib/utils";
-
 interface SectionLayoutProps {
     title: string;
     children: React.ReactNode;
-    className?: string;
 }
 
-export function SectionLayout({ title, children, className }: SectionLayoutProps) {
+export function SectionLayout({ title, children }: SectionLayoutProps) {
     return (
-        <section className={cn("cv-section", className)}>
+        <section className="cv-section cv-section-items-wrapper">
             <h2 className="cv-section-title">{title}</h2>
             <div className="cv-section-items">{children}</div>
         </section>
@@ -18,17 +15,12 @@ export function SectionLayout({ title, children, className }: SectionLayoutProps
 interface ItemRowProps {
     date: string;
     children: React.ReactNode;
-    className?: string;
 }
 
-export function ItemRow({ date, children, className }: ItemRowProps) {
+export function ItemRow({ date, children }: ItemRowProps) {
     return (
-        <div className={cn("cv-item-row", className)}>
-            <div className="cv-date-column">
-                <span className="font-mono text-[12px] leading-none text-[var(--color-text-muted)]">
-                    {date}
-                </span>
-            </div>
+        <div className="cv-item-row">
+            <div className="cv-date-column">{date}</div>
             <div className="cv-content-column">{children}</div>
         </div>
     );

@@ -23,16 +23,16 @@ export class Media extends Model {
   declare id: string;
 
   @ForeignKey(() => Profile)
-  @Column({ type: DataType.UUID, allowNull: false })
-  declare profileId: string;
+  @Column({ type: DataType.UUID, allowNull: true })
+  declare profileId: string | null;
 
   @Index('media_entity_type_entity_id_sort_order_idx')
   @Column({ type: DataType.STRING, allowNull: false })
   declare entityType: string;
 
   @Index('media_entity_type_entity_id_sort_order_idx')
-  @Column({ type: DataType.UUID, allowNull: false })
-  declare entityId: string;
+  @Column({ type: DataType.UUID, allowNull: true })
+  declare entityId: string | null;
 
   @Index('media_storage_key_idx')
   @Column({ type: DataType.STRING, allowNull: false })

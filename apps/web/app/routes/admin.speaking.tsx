@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/admin-api";
 import { SectionEditor } from "@/components/admin/section-editor";
+import { MultiImageUploader } from "@/components/admin/multi-image-uploader";
 import { TextInput, DateInput } from "@/components/admin/form-fields";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ function SpeakingForm({
         event: item?.event ?? "",
         location: item?.location ?? "",
         date: item?.date ?? "",
+        images: (item as unknown as Record<string, unknown>)?.images as string[] ?? [],
     });
 
     function set(field: string, value: string) {
@@ -52,6 +54,12 @@ function SpeakingForm({
                 <TextInput label="URL" value={form.url} onChange={(e) => set("url", e.target.value)} type="url" placeholder="https://" />
                 <DateInput label="Date" value={form.date} onChange={(e) => set("date", e.target.value)} required />
             </div>
+            <MultiImageUploader
+                images={form.images}
+                onChange={(urls) => setForm((prev) => ({ ...prev, images: urls }))}
+                purpose="speaking"
+                maxImages={5}
+            />
             <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={onCancel} className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[13px] font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-tag-bg)]">
                     Cancel
@@ -69,7 +77,7 @@ export default function SpeakingEditor() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        adminFetch<Speaking[]>("/api/admin/speaking")
+        adminFetch<Speaking[]>("/api/admin/speakings")
             .then(setItems)
             .catch(() => toast.error("Failed to load speaking"))
             .finally(() => setLoading(false));
@@ -82,7 +90,7 @@ export default function SpeakingEditor() {
     return (
         <SectionEditor<Speaking>
             title="Speaking"
-            apiPath="/api/admin/speaking"
+            apiPath="/api/admin/speakings"
             items={items}
             onItemsChange={setItems}
             createEmpty={() => ({ title: "", date: "" } as Omit<Speaking, "id">)}

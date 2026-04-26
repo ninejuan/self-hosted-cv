@@ -9,13 +9,16 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateExperienceDto {
   @IsUUID()
-  sectionId!: string;
+  @IsOptional()
+  sectionId?: string;
 
   @IsUUID()
-  profileId!: string;
+  @IsOptional()
+  profileId?: string;
 
   @IsString()
   @MaxLength(255)
@@ -28,8 +31,9 @@ export class CreateExperienceDto {
   @IsDateString()
   startDate!: string;
 
-  @IsDateString()
+  @Transform(({ value }) => (value === "" ? null : value))
   @IsOptional()
+  @IsDateString({}, { message: "endDate must be a valid date or empty" })
   endDate?: string | null;
 
   @IsString()
@@ -41,7 +45,8 @@ export class CreateExperienceDto {
   @IsOptional()
   description?: string | null;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   url?: string | null;

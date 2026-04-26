@@ -73,7 +73,7 @@ export default function EducationEditor() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        adminFetch<Education[]>("/api/admin/education")
+        adminFetch<Education[]>("/api/admin/educations")
             .then(setItems)
             .catch(() => toast.error("Failed to load education"))
             .finally(() => setLoading(false));
@@ -86,7 +86,7 @@ export default function EducationEditor() {
     return (
         <SectionEditor<Education>
             title="Education"
-            apiPath="/api/admin/education"
+            apiPath="/api/admin/educations"
             items={items}
             onItemsChange={setItems}
             createEmpty={() => ({ degree: "", institution: "", startDate: "" } as Omit<Education, "id">)}

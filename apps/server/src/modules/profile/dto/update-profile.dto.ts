@@ -5,6 +5,7 @@ import {
   IsUrl,
   MaxLength,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 import { ProfileStatus, ProfileTheme } from '@/database/enums';
 
@@ -24,7 +25,8 @@ export class UpdateProfileDto {
   @MaxLength(255)
   location?: string | null;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   website?: string | null;
@@ -33,7 +35,8 @@ export class UpdateProfileDto {
   @IsOptional()
   bio?: string | null;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   avatarUrl?: string | null;
@@ -52,10 +55,17 @@ export class UpdateProfileDto {
   @IsOptional()
   metaDescription?: string | null;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   ogImageUrl?: string | null;
+
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
+  @IsOptional()
+  @MaxLength(2048)
+  faviconUrl?: string | null;
 
   @IsEnum(ProfileStatus)
   @IsOptional()

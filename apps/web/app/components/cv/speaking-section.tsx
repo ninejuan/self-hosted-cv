@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/date";
 import type { Speaking } from "@/types/cv";
 import { ExternalLink } from "./external-link";
 import { SectionLayout, ItemRow } from "./section-layout";
@@ -12,28 +13,27 @@ export function SpeakingSection({ items }: SpeakingSectionProps) {
     return (
         <SectionLayout title="Speaking">
             {items.map((item) => (
-                <ItemRow key={item.id} date={item.date}>
-                    <div className="flex flex-col gap-1">
-                        <p className="text-[14px] font-medium text-[var(--color-text-primary)]">
-                            {item.url ? (
-                                <ExternalLink href={item.url} className="font-medium">
-                                    {item.title}
-                                </ExternalLink>
-                            ) : (
-                                item.title
-                            )}
-                        </p>
-                        {item.event && (
-                            <p className="text-[12px] text-[var(--color-text-muted)]">
-                                {item.event}
-                            </p>
-                        )}
-                        {item.location && (
-                            <p className="text-[12px] text-[var(--color-text-muted)]">
-                                {item.location}
-                            </p>
-                        )}
-                    </div>
+                <ItemRow key={item.id} date={formatDate(item.date)}>
+                    {item.url ? (
+                        <ExternalLink href={item.url}>{item.title}</ExternalLink>
+                    ) : (
+                        <span className="cv-item-title">{item.title}</span>
+                    )}
+                    {item.event && (
+                        <span className="cv-item-subtitle">{item.event}</span>
+                    )}
+                    {item.location && (
+                        <span className="cv-item-subtitle">{item.location}</span>
+                    )}
+                    {item.media && item.media.length > 0 && (
+                        <div className="cv-item-images">
+                            {item.media.map((m) => (
+                                <div key={m.url} className="cv-item-image-wrapper">
+                                    <img src={m.url} alt={m.alt ?? item.title} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </ItemRow>
             ))}
         </SectionLayout>
