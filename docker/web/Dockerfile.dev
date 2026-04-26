@@ -5,17 +5,13 @@ ENV APP_PORT=3000
 
 WORKDIR /app
 
-RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
-
 COPY package.json yarn.lock ./
 COPY apps/server/package.json apps/server/package.json
 COPY apps/web/package.json apps/web/package.json
 
 RUN yarn install --frozen-lockfile && yarn cache clean
 
-COPY --chown=nodejs:nodejs apps/web apps/web
-
-USER nodejs
+COPY apps/web apps/web
 
 WORKDIR /app/apps/web
 

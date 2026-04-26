@@ -5,21 +5,17 @@ ENV APP_PORT=3000
 
 WORKDIR /app
 
-RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
-
 COPY package.json yarn.lock ./
 COPY apps/server/package.json apps/server/package.json
 COPY apps/web/package.json apps/web/package.json
 
 RUN yarn install --frozen-lockfile && yarn cache clean
 
-COPY --chown=nodejs:nodejs apps/server apps/server
-
-USER nodejs
+COPY apps/server apps/server
 
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD wget -qO- http://localhost:3000/health || exit 1
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
 
 CMD ["yarn", "workspace", "@ninejuan/cv-server", "start:dev"]
