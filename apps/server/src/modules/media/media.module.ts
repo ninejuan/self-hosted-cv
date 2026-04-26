@@ -9,8 +9,8 @@ import { MediaController } from './media.controller';
 import { MediaService } from './media.service';
 
 @Module({
-    imports: [SequelizeModule.forFeature([Media]), MinioModule],
-    controllers: [MediaController],
-    providers: [MediaService, MediaCleanupService],
+  imports: [SequelizeModule.forFeature([Media]), MinioModule],
+  controllers: [MediaController],
+  providers: [MediaService, MediaCleanupService],
 })
 export class MediaModule {}

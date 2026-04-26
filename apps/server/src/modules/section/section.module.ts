@@ -6,9 +6,9 @@ import { SectionController } from './section.controller';
 import { SectionService } from './section.service';
 
 @Module({
-    imports: [SequelizeModule.forFeature([Section])],
-    controllers: [SectionController],
-    providers: [SectionService],
-    exports: [SectionService],
+  imports: [SequelizeModule.forFeature([Section])],
+  controllers: [SectionController],
+  providers: [SectionService],
+  exports: [SectionService],
 })
 export class SectionModule {}

@@ -6,15 +6,15 @@ import { SettingsService } from './settings.service';
 
 @Controller('admin/settings')
 export class SettingsController {
-    constructor(private readonly settingsService: SettingsService) {}
+  constructor(private readonly settingsService: SettingsService) {}
 
-    @Get()
-    findAll(): Promise<AppSetting[]> {
-        return this.settingsService.findAll();
-    }
+  @Get()
+  findAll(): Promise<AppSetting[]> {
+    return this.settingsService.findAll();
+  }
 
-    @Put()
-    update(@Body() dto: UpdateSettingsDto): Promise<AppSetting[]> {
-        return this.settingsService.update(dto);
-    }
+  @Put()
+  update(@Body() dto: UpdateSettingsDto): Promise<AppSetting[]> {
+    return this.settingsService.update(dto);
+  }
 }

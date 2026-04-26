@@ -45,64 +45,77 @@ import { Writing } from '@/modules/writing/entities/writing.entity';
 import { WritingModule } from '@/modules/writing/writing.module';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-            load: [databaseConfig, redisConfig],
-            validate: validateEnvironment,
-        }),
-        CacheModule.register({ isGlobal: true }),
-        ScheduleModule.forRoot(),
-        SequelizeModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => ({
-                ...configService.getOrThrow('database'),
-                models: [Profile, Section, WorkExperience, Writing, Speaking, SideProject, Education, SocialLink, Media, AuditLog, AppSetting],
-            }),
-        }),
-        RedisModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => configService.getOrThrow('redis'),
-        }),
-        AuditModule,
-        AuthModule,
-        MinioModule,
-        MediaModule,
-        HealthModule,
-        ProfileModule,
-        SectionModule,
-        ExperienceModule,
-        WritingModule,
-        SpeakingModule,
-        ProjectModule,
-        EducationModule,
-        ContactModule,
-        CvModule,
-        UpdateCheckerModule,
-        SettingsModule,
-        LinkedinModule,
-    ],
-    providers: [
-        LoggerService,
-        MigrationRunner,
-        {
-            provide: APP_GUARD,
-            useClass: AuthGuard,
-        },
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: AuditInterceptor,
-        },
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: CacheInvalidationInterceptor,
-        },
-    ],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [databaseConfig, redisConfig],
+      validate: validateEnvironment,
+    }),
+    CacheModule.register({ isGlobal: true }),
+    ScheduleModule.forRoot(),
+    SequelizeModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        ...configService.getOrThrow<Record<string, unknown>>('database'),
+        models: [
+          Profile,
+          Section,
+          WorkExperience,
+          Writing,
+          Speaking,
+          SideProject,
+          Education,
+          SocialLink,
+          Media,
+          AuditLog,
+          AppSetting,
+        ],
+      }),
+    }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) =>
+        configService.getOrThrow('redis'),
+    }),
+    AuditModule,
+    AuthModule,
+    MinioModule,
+    MediaModule,
+    HealthModule,
+    ProfileModule,
+    SectionModule,
+    ExperienceModule,
+    WritingModule,
+    SpeakingModule,
+    ProjectModule,
+    EducationModule,
+    ContactModule,
+    CvModule,
+    UpdateCheckerModule,
+    SettingsModule,
+    LinkedinModule,
+  ],
+  providers: [
+    LoggerService,
+    MigrationRunner,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInvalidationInterceptor,
+    },
+  ],
 })
 export class AppModule implements NestModule {
-    configure(consumer: MiddlewareConsumer): void {
-        consumer.apply(RequestIdMiddleware).forRoutes('*');
-    }
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
 }

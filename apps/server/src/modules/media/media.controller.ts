@@ -1,4 +1,11 @@
-import { Body, Controller, Delete, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 
 import { MediaStatus } from '@/database/enums';
 
@@ -9,20 +16,24 @@ import { MediaService } from './media.service';
 
 @Controller('admin/media')
 export class MediaController {
-    constructor(private readonly mediaService: MediaService) {}
+  constructor(private readonly mediaService: MediaService) {}
 
-    @Post('presign')
-    presign(@Body() dto: PresignMediaDto): Promise<{ uploadUrl: string; objectKey: string; media: Media }> {
-        return this.mediaService.presign(dto);
-    }
+  @Post('presign')
+  presign(
+    @Body() dto: PresignMediaDto,
+  ): Promise<{ uploadUrl: string; objectKey: string; media: Media }> {
+    return this.mediaService.presign(dto);
+  }
 
-    @Post('confirm')
-    confirm(@Body() dto: ConfirmMediaDto): Promise<Media> {
-        return this.mediaService.confirm(dto);
-    }
+  @Post('confirm')
+  confirm(@Body() dto: ConfirmMediaDto): Promise<Media> {
+    return this.mediaService.confirm(dto);
+  }
 
-    @Delete(':id')
-    delete(@Param('id', new ParseUUIDPipe()) id: string): Promise<{ id: string; status: MediaStatus.Deleted }> {
-        return this.mediaService.delete(id);
-    }
+  @Delete(':id')
+  delete(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<{ id: string; status: MediaStatus.Deleted }> {
+    return this.mediaService.delete(id);
+  }
 }

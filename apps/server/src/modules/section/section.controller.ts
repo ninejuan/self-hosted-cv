@@ -6,15 +6,15 @@ import { SectionService } from './section.service';
 
 @Controller('admin/sections')
 export class SectionController {
-    constructor(private readonly sectionService: SectionService) {}
+  constructor(private readonly sectionService: SectionService) {}
 
-    @Get()
-    getSections(): Promise<Section[]> {
-        return this.sectionService.getSections();
-    }
+  @Get()
+  getSections(): Promise<Section[]> {
+    return this.sectionService.getSections();
+  }
 
-    @Put('reorder')
-    reorder(@Body() dto: ReorderSectionsDto): Promise<Section[]> {
-        return this.sectionService.reorder(dto);
-    }
+  @Put('reorder')
+  reorder(@Body() dto: ReorderSectionsDto): Promise<Section[]> {
+    return this.sectionService.reorder(dto);
+  }
 }

@@ -14,8 +14,19 @@ import { CvController } from './cv.controller';
 import { CvService } from './cv.service';
 
 @Module({
-    imports: [SequelizeModule.forFeature([Profile, Section, WorkExperience, Writing, Speaking, SideProject, Education, SocialLink])],
-    controllers: [CvController],
-    providers: [CvService],
+  imports: [
+    SequelizeModule.forFeature([
+      Profile,
+      Section,
+      WorkExperience,
+      Writing,
+      Speaking,
+      SideProject,
+      Education,
+      SocialLink,
+    ]),
+  ],
+  controllers: [CvController],
+  providers: [CvService],
 })
 export class CvModule {}
