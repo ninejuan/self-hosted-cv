@@ -40,3 +40,9 @@ docker/data/
 
 # Misc
 *.tsbuildinfo
+
+# Screenshots and playwright artifacts
+*.png
+*.jpeg
+*.jpg
+.playwright-mcp/
