@@ -87,7 +87,9 @@ export class MediaService {
     const exists = await this.minioService.objectExists(media.storageKey);
 
     if (!exists) {
-      throw new BadRequestException('Uploaded object does not exist in storage');
+      throw new BadRequestException(
+        'Uploaded object does not exist in storage',
+      );
     }
 
     media.status = MediaStatus.Attached;

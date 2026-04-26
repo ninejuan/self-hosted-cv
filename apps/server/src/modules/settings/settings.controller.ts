@@ -24,7 +24,9 @@ export class SettingsController {
   }
 
   @Put('site')
-  updateSiteSettings(@Body() data: Partial<SiteSettings>): Promise<SiteSettings> {
+  updateSiteSettings(
+    @Body() data: Partial<SiteSettings>,
+  ): Promise<SiteSettings> {
     return this.settingsService.updateSiteSettings(data);
   }
 }

@@ -22,13 +22,21 @@ export class ExperienceService {
     @InjectModel(Section) private readonly sectionModel: typeof Section,
   ) {}
 
-  private async resolveIds(dto: { profileId?: string; sectionId?: string }): Promise<{ profileId: string; sectionId: string }> {
+  private async resolveIds(dto: {
+    profileId?: string;
+    sectionId?: string;
+  }): Promise<{ profileId: string; sectionId: string }> {
     let profileId = dto.profileId;
     let sectionId = dto.sectionId;
 
     if (!profileId) {
-      const profile = await this.profileModel.findOne({ order: [['createdAt', 'ASC']] });
-      if (!profile) throw new NotFoundException('No profile found. Create a profile first.');
+      const profile = await this.profileModel.findOne({
+        order: [['createdAt', 'ASC']],
+      });
+      if (!profile)
+        throw new NotFoundException(
+          'No profile found. Create a profile first.',
+        );
       profileId = profile.id;
     }
 
@@ -41,7 +49,7 @@ export class ExperienceService {
       } else {
         const created = await this.sectionModel.create({
           profileId,
-          type: 'work_experience' as SectionType,
+          type: 'work_experience',
           title: 'Work Experience',
           sortOrder: 0,
           visible: true,

@@ -34,7 +34,7 @@ export class UpdateSpeakingDto {
   @IsOptional()
   date?: string;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)

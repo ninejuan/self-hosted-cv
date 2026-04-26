@@ -132,10 +132,9 @@ export class CvService {
     }
   }
 
-  private async withMedia<T extends { id: string; toJSON: () => Record<string, unknown> }>(
-    items: T[],
-    entityType: string,
-  ): Promise<T[]> {
+  private async withMedia<
+    T extends { id: string; toJSON: () => Record<string, unknown> },
+  >(items: T[], entityType: string): Promise<T[]> {
     const ids = items.map((i) => i.id);
     const media = ids.length
       ? await this.mediaModel.findAll({

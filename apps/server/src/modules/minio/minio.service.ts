@@ -11,16 +11,15 @@ export class MinioService implements OnModuleInit {
 
   constructor(private readonly configService: ConfigService) {
     this.bucket = this.configService.getOrThrow<string>('MINIO_BUCKET');
-    this.publicEndpoint =
-      this.configService.getOrThrow<string>('MINIO_PUBLIC_ENDPOINT');
+    this.publicEndpoint = this.configService.getOrThrow<string>(
+      'MINIO_PUBLIC_ENDPOINT',
+    );
     this.internalClient = new Client(
       this.createClientOptions(
         this.configService.getOrThrow<string>('MINIO_INTERNAL_ENDPOINT'),
       ),
     );
-    this.presignClient = new Client(
-      this.createPresignClientOptions(),
-    );
+    this.presignClient = new Client(this.createPresignClientOptions());
   }
 
   async onModuleInit(): Promise<void> {
@@ -76,8 +75,9 @@ export class MinioService implements OnModuleInit {
   }
 
   getPublicUrl(objectKey: string): string {
-    const publicEndpoint =
-      this.configService.getOrThrow<string>('MINIO_PUBLIC_ENDPOINT');
+    const publicEndpoint = this.configService.getOrThrow<string>(
+      'MINIO_PUBLIC_ENDPOINT',
+    );
 
     return `${publicEndpoint}/${this.bucket}/${objectKey}`;
   }

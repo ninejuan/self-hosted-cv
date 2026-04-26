@@ -25,7 +25,7 @@ export class UpdateProfileDto {
   @MaxLength(255)
   location?: string | null;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
@@ -35,7 +35,7 @@ export class UpdateProfileDto {
   @IsOptional()
   bio?: string | null;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
@@ -55,13 +55,13 @@ export class UpdateProfileDto {
   @IsOptional()
   metaDescription?: string | null;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   ogImageUrl?: string | null;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
