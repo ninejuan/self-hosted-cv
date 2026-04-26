@@ -1,0 +1,111 @@
+- generic [ref=e15]:
+  - complementary [ref=e16]:
+    - generic [ref=e18]: Admin
+    - navigation [ref=e19]:
+      - list [ref=e20]:
+        - listitem [ref=e21]:
+          - link "Dashboard" [ref=e22] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e23]
+            - text: Dashboard
+        - listitem [ref=e28]:
+          - link "Profile" [ref=e29] [cursor=pointer]:
+            - /url: /admin/profile
+            - img [ref=e30]
+            - text: Profile
+        - listitem [ref=e33]:
+          - link "Sections" [ref=e34] [cursor=pointer]:
+            - /url: /admin/sections
+            - img [ref=e35]
+            - text: Sections
+        - listitem [ref=e39]:
+          - link "Experience" [ref=e40] [cursor=pointer]:
+            - /url: /admin/experience
+            - img [ref=e41]
+            - text: Experience
+        - listitem [ref=e44]:
+          - link "Writing" [ref=e45] [cursor=pointer]:
+            - /url: /admin/writing
+            - img [ref=e46]
+            - text: Writing
+        - listitem [ref=e48]:
+          - link "Speaking" [ref=e49] [cursor=pointer]:
+            - /url: /admin/speaking
+            - img [ref=e50]
+            - text: Speaking
+        - listitem [ref=e54]:
+          - link "Projects" [ref=e55] [cursor=pointer]:
+            - /url: /admin/projects
+            - img [ref=e56]
+            - text: Projects
+        - listitem [ref=e58]:
+          - link "Education" [ref=e59] [cursor=pointer]:
+            - /url: /admin/education
+            - img [ref=e60]
+            - text: Education
+        - listitem [ref=e63]:
+          - link "Contacts" [ref=e64] [cursor=pointer]:
+            - /url: /admin/contacts
+            - img [ref=e65]
+            - text: Contacts
+        - listitem [ref=e69]:
+          - link "LinkedIn Import" [ref=e70] [cursor=pointer]:
+            - /url: /admin/linkedin
+            - img [ref=e71]
+            - text: LinkedIn Import
+        - listitem [ref=e77]:
+          - link "Settings" [ref=e78] [cursor=pointer]:
+            - /url: /admin/settings
+            - img [ref=e79]
+            - text: Settings
+        - listitem [ref=e82]:
+          - link "Audit Log" [ref=e83] [cursor=pointer]:
+            - /url: /admin/audit-logs
+            - img [ref=e84]
+            - text: Audit Log
+    - button "Logout" [ref=e88]:
+      - img [ref=e89]
+      - text: Logout
+  - generic [ref=e92]:
+    - banner [ref=e93]
+    - main [ref=e94]:
+      - generic [ref=e97]:
+        - heading "Dashboard" [level=1] [ref=e98]
+        - paragraph [ref=e99]: Manage your CV content
+        - generic [ref=e100]:
+          - link "Profile" [ref=e101] [cursor=pointer]:
+            - /url: /admin/profile
+            - img [ref=e103]
+            - paragraph [ref=e107]: Profile
+            - img [ref=e108]
+          - link "Experience" [ref=e110] [cursor=pointer]:
+            - /url: /admin/experience
+            - img [ref=e112]
+            - paragraph [ref=e116]: Experience
+            - img [ref=e117]
+          - link "Writing" [ref=e119] [cursor=pointer]:
+            - /url: /admin/writing
+            - img [ref=e121]
+            - paragraph [ref=e124]: Writing
+            - img [ref=e125]
+          - link "Speaking" [ref=e127] [cursor=pointer]:
+            - /url: /admin/speaking
+            - img [ref=e129]
+            - paragraph [ref=e134]: Speaking
+            - img [ref=e135]
+          - link "Projects" [ref=e137] [cursor=pointer]:
+            - /url: /admin/projects
+            - img [ref=e139]
+            - paragraph [ref=e142]: Projects
+            - img [ref=e143]
+          - link "Education" [ref=e145] [cursor=pointer]:
+            - /url: /admin/education
+            - img [ref=e147]
+            - paragraph [ref=e151]: Education
+            - img [ref=e152]
+          - link "Contacts" [ref=e154] [cursor=pointer]:
+            - /url: /admin/contacts
+            - img [ref=e156]
+            - paragraph [ref=e161]: Contacts
+            - img [ref=e162]
+  - region "Notifications alt+T"

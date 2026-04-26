@@ -1,0 +1,55 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - 'button "Theme: System. Click to change." [ref=e4]':
+      - img [ref=e5]
+    - button "PDF로 저장" [ref=e7]:
+      - img [ref=e8]
+  - generic [ref=e12]:
+    - img "Playwright User" [ref=e13]
+    - generic [ref=e14]:
+      - heading "Playwright User" [level=1] [ref=e15]
+      - paragraph [ref=e16]: QA Engineer in Seoul
+  - generic [ref=e17]:
+    - heading "About" [level=2] [ref=e18]
+    - paragraph [ref=e19]: Testing every admin flow end-to-end.
+  - generic [ref=e20]:
+    - heading "Work Experience" [level=2] [ref=e21]
+    - generic [ref=e23]:
+      - generic [ref=e24]: Jan 2023 — Present
+      - generic [ref=e26]:
+        - paragraph [ref=e27]: Senior Engineer at Acme Corp
+        - paragraph [ref=e28]: Seoul, KR
+        - paragraph [ref=e29]: Built amazing things.
+  - generic [ref=e30]:
+    - heading "Writing" [level=2] [ref=e31]
+    - paragraph [ref=e37]: Test Article
+  - generic [ref=e38]:
+    - heading "Speaking" [level=2] [ref=e39]
+    - generic [ref=e41]:
+      - generic [ref=e42]: Jun 2024
+      - paragraph [ref=e45]: Test Talk
+  - generic [ref=e46]:
+    - heading "Side Projects" [level=2] [ref=e47]
+    - generic [ref=e49]:
+      - generic [ref=e50]: — Present
+      - paragraph [ref=e53]: Test Project
+  - generic [ref=e54]:
+    - heading "Education" [level=2] [ref=e55]
+    - generic [ref=e57]:
+      - generic [ref=e58]: Mar 2015 — Present
+      - paragraph [ref=e61]: BS Computer Science at Seoul National University
+  - generic [ref=e62]:
+    - heading "Contact" [level=2] [ref=e63]
+    - generic [ref=e64]:
+      - generic [ref=e65]:
+        - generic [ref=e66]: github
+        - link "ninejuan" [ref=e68] [cursor=pointer]:
+          - /url: https://github.com/ninejuan
+          - text: ninejuan
+          - img [ref=e69]
+      - generic [ref=e72]:
+        - generic [ref=e73]: linkedin
+        - link "ninejuan" [ref=e75] [cursor=pointer]:
+          - /url: https://linkedin.com/in/ninejuan
+          - text: ninejuan
+          - img [ref=e76]

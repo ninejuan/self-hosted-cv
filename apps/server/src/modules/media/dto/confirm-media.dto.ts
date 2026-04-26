@@ -1,8 +1,9 @@
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class ConfirmMediaDto {
-  @IsUUID()
-  mediaId!: string;
+  @IsString()
+  @IsNotEmpty()
+  key!: string;
 
   @IsString()
   @IsOptional()

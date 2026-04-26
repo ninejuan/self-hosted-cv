@@ -23,7 +23,6 @@ export class ReorderSectionItemDto {
 
 export class ReorderSectionsDto {
   @IsArray()
-  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ReorderSectionItemDto)
   items!: ReorderSectionItemDto[];

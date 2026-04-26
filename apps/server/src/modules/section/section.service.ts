@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { getConnectionToken } from '@nestjs/sequelize';
+import { Inject } from '@nestjs/common';
 
 import { ReorderSectionsDto } from './dto/reorder-sections.dto';
 import { Section } from './entities/section.entity';
@@ -9,7 +11,7 @@ import { Section } from './entities/section.entity';
 export class SectionService {
   constructor(
     @InjectModel(Section) private readonly sectionModel: typeof Section,
-    private readonly sequelize: Sequelize,
+    @Inject(getConnectionToken()) private readonly sequelize: Sequelize,
   ) {}
 
   getSections(): Promise<Section[]> {

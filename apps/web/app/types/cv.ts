@@ -51,6 +51,7 @@ export interface Speaking {
     event?: string;
     location?: string;
     date: string;
+    media?: Media[];
 }
 
 export interface SideProject {
@@ -60,6 +61,7 @@ export interface SideProject {
     description?: string;
     startDate: string;
     endDate?: string;
+    media?: Media[];
 }
 
 export interface Education {

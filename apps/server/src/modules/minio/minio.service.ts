@@ -5,20 +5,21 @@ import { Client, ClientOptions } from 'minio';
 @Injectable()
 export class MinioService implements OnModuleInit {
   private readonly internalClient: Client;
-  private readonly publicClient: Client;
+  private readonly presignClient: Client;
   private readonly bucket: string;
+  private readonly publicEndpoint: string;
 
   constructor(private readonly configService: ConfigService) {
     this.bucket = this.configService.getOrThrow<string>('MINIO_BUCKET');
+    this.publicEndpoint =
+      this.configService.getOrThrow<string>('MINIO_PUBLIC_ENDPOINT');
     this.internalClient = new Client(
       this.createClientOptions(
         this.configService.getOrThrow<string>('MINIO_INTERNAL_ENDPOINT'),
       ),
     );
-    this.publicClient = new Client(
-      this.createClientOptions(
-        this.configService.getOrThrow<string>('MINIO_PUBLIC_ENDPOINT'),
-      ),
+    this.presignClient = new Client(
+      this.createPresignClientOptions(),
     );
   }
 
@@ -28,6 +29,20 @@ export class MinioService implements OnModuleInit {
     if (!exists) {
       await this.internalClient.makeBucket(this.bucket);
     }
+
+    const policy = JSON.stringify({
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: { AWS: ['*'] },
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${this.bucket}/*`],
+        },
+      ],
+    });
+
+    await this.internalClient.setBucketPolicy(this.bucket, policy);
   }
 
   async generatePresignedPutUrl(
@@ -36,7 +51,7 @@ export class MinioService implements OnModuleInit {
     expiresIn: number,
   ): Promise<string> {
     void contentType;
-    return this.publicClient.presignedPutObject(
+    return this.presignClient.presignedPutObject(
       this.bucket,
       objectKey,
       expiresIn,
@@ -60,6 +75,13 @@ export class MinioService implements OnModuleInit {
     return this.bucket;
   }
 
+  getPublicUrl(objectKey: string): string {
+    const publicEndpoint =
+      this.configService.getOrThrow<string>('MINIO_PUBLIC_ENDPOINT');
+
+    return `${publicEndpoint}/${this.bucket}/${objectKey}`;
+  }
+
   private createClientOptions(endpoint: string): ClientOptions {
     const url = new URL(endpoint);
 
@@ -70,6 +92,20 @@ export class MinioService implements OnModuleInit {
       accessKey: this.configService.getOrThrow<string>('MINIO_ACCESS_KEY'),
       secretKey: this.configService.getOrThrow<string>('MINIO_SECRET_KEY'),
       pathStyle: true,
+    };
+  }
+
+  private createPresignClientOptions(): ClientOptions {
+    const url = new URL(this.publicEndpoint);
+
+    return {
+      endPoint: url.hostname,
+      port: url.port ? Number(url.port) : undefined,
+      useSSL: url.protocol === 'https:',
+      accessKey: this.configService.getOrThrow<string>('MINIO_ACCESS_KEY'),
+      secretKey: this.configService.getOrThrow<string>('MINIO_SECRET_KEY'),
+      pathStyle: true,
+      region: 'us-east-1',
     };
   }
 }

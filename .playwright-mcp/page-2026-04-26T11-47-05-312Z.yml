@@ -1,0 +1,191 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - 'button "Theme: System. Click to change." [ref=e4]':
+      - img [ref=e5]
+    - button "PDF로 저장" [ref=e7]:
+      - img [ref=e8]
+  - generic [ref=e12]:
+    - img "Sara Lawrence" [ref=e13]
+    - generic [ref=e14]:
+      - heading "Sara Lawrence" [level=1] [ref=e15]
+      - paragraph [ref=e16]: Design in San Francisco
+    - link "website.com" [ref=e17] [cursor=pointer]:
+      - /url: https://website.com
+  - generic [ref=e18]:
+    - generic [ref=e19]:
+      - heading "About" [level=2] [ref=e20]
+      - paragraph [ref=e21]: I'm a passionate UX designer striving to create intuitive and engaging experiences. I'm a big believer that things can always be simpler than we think.
+    - generic [ref=e22]:
+      - heading "Work Experience" [level=2] [ref=e23]
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - generic [ref=e26]: 2017 — Now
+          - generic [ref=e27]:
+            - link "Senior Designer at Magic Design Co" [ref=e28] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Senior Designer at Magic Design Co
+              - img [ref=e30]
+            - generic [ref=e33]: San Francisco, CA
+        - generic [ref=e34]:
+          - generic [ref=e35]: 2015 — 2017
+          - generic [ref=e36]:
+            - link "Junior Designer at Creative Co" [ref=e37] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Junior Designer at Creative Co
+              - img [ref=e39]
+            - generic [ref=e42]: Atlanta, GA
+            - generic [ref=e43]:
+              - img "Creative Co" [ref=e45]
+              - img "Creative Co" [ref=e47]
+              - img "Creative Co" [ref=e49]
+        - generic [ref=e50]:
+          - generic [ref=e51]: 2014 — 2015
+          - generic [ref=e52]:
+            - link "Intern at Design Hub" [ref=e53] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Intern at Design Hub
+              - img [ref=e55]
+            - generic [ref=e58]: Atlanta, GA
+        - generic [ref=e59]:
+          - generic [ref=e60]: 2012 — 2014
+          - generic [ref=e61]:
+            - generic [ref=e62]: Freelance Graphic Designer
+            - generic [ref=e63]: Remote
+        - generic [ref=e64]:
+          - generic [ref=e65]: 2010 — 2012
+          - generic [ref=e66]:
+            - link "Art Assistant at Studio X" [ref=e67] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Art Assistant at Studio X
+              - img [ref=e69]
+            - generic [ref=e72]: Cincinnati, OH
+        - generic [ref=e73]:
+          - generic [ref=e74]: 2008 — 2010
+          - generic [ref=e75]:
+            - link "Volunteer Designer at Nonprofit Y" [ref=e76] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Volunteer Designer at Nonprofit Y
+              - img [ref=e78]
+            - generic [ref=e81]: Cincinnati, OH
+    - generic [ref=e82]:
+      - heading "Writing" [level=2] [ref=e83]
+      - generic [ref=e84]:
+        - generic [ref=e85]:
+          - generic [ref=e86]: "2023"
+          - generic [ref=e87]:
+            - link "Exploring the Intersection of Design and Technology" [ref=e88] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Exploring the Intersection of Design and Technology
+              - img [ref=e90]
+            - generic [ref=e93]: Collaboration with Mia, Leo, and Ava
+            - generic [ref=e95]:
+              - img "Exploring the Intersection of Design and Technology" [ref=e97]
+              - generic [ref=e98]:
+                - generic [ref=e99]: This is a site title that can go…
+                - generic [ref=e100]: 1 min read
+        - generic [ref=e101]:
+          - generic [ref=e102]: "2023"
+          - generic [ref=e103]:
+            - generic [ref=e104]: Understanding Design Hierarchies
+            - generic [ref=e105]: Worked alongside Alex
+        - generic [ref=e106]:
+          - generic [ref=e107]: "2020"
+          - generic [ref=e109]: The Art of User-Centered Design
+        - generic [ref=e110]:
+          - generic [ref=e111]: "2019"
+          - generic [ref=e113]: Navigating Design Challenges
+        - generic [ref=e114]:
+          - generic [ref=e115]: "2018"
+          - generic [ref=e117]: Crafting Engaging User Experiences
+        - generic [ref=e118]:
+          - generic [ref=e119]: "2018"
+          - generic [ref=e121]: Building a Cohesive Design Language
+        - generic [ref=e122]:
+          - generic [ref=e123]: "2017"
+          - generic [ref=e125]: The Power of Visual Storytelling
+    - generic [ref=e126]:
+      - heading "Speaking" [level=2] [ref=e127]
+      - generic [ref=e128]:
+        - generic [ref=e129]:
+          - generic [ref=e130]: "2024"
+          - generic [ref=e131]:
+            - generic [ref=e132]: Designing for accessibility
+            - generic [ref=e133]: Los Angeles, CA
+        - generic [ref=e134]:
+          - generic [ref=e135]: "2024"
+          - generic [ref=e136]:
+            - generic [ref=e137]: How to make things super simple
+            - generic [ref=e138]: Miami, FL
+        - generic [ref=e139]:
+          - generic [ref=e140]: "2023"
+          - generic [ref=e142]: Designing your career
+    - generic [ref=e143]:
+      - heading "Side Projects" [level=2] [ref=e144]
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - generic [ref=e147]: 2021 — Now
+          - generic [ref=e149]: Nature walks
+        - generic [ref=e150]:
+          - generic [ref=e151]: 2020 — Now
+          - generic [ref=e153]: Plant-based cookware
+        - generic [ref=e154]:
+          - generic [ref=e155]: 2019 — Now
+          - generic [ref=e157]: Interactive art installation
+    - generic [ref=e158]:
+      - heading "Education" [level=2] [ref=e159]
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - generic [ref=e162]: 2010 — 2010
+          - generic [ref=e163]:
+            - link "Master's in Interaction Design at Georgia Tech" [ref=e164] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Master's in Interaction Design at Georgia Tech
+              - img [ref=e166]
+            - generic [ref=e169]: Atlanta, GA
+        - generic [ref=e170]:
+          - generic [ref=e171]: 2006 — 2010
+          - generic [ref=e172]:
+            - link "Bachelor's in Communication Design at University of Cincinnati" [ref=e173] [cursor=pointer]:
+              - /url: https://example.com
+              - text: Bachelor's in Communication Design at University of Cincinnati
+              - img [ref=e175]
+            - generic [ref=e178]: Cincinnati, OH
+    - generic [ref=e179]:
+      - heading "Contact" [level=2] [ref=e180]
+      - generic [ref=e181]:
+        - generic [ref=e182]:
+          - generic [ref=e183]: Threads
+          - link "username" [ref=e185] [cursor=pointer]:
+            - /url: https://threads.net/username
+            - text: username
+            - img [ref=e187]
+        - generic [ref=e190]:
+          - generic [ref=e191]: Figma
+          - link "username" [ref=e193] [cursor=pointer]:
+            - /url: https://figma.com/@username
+            - text: username
+            - img [ref=e195]
+        - generic [ref=e198]:
+          - generic [ref=e199]: Instagram
+          - link "username" [ref=e201] [cursor=pointer]:
+            - /url: https://instagram.com/username
+            - text: username
+            - img [ref=e203]
+        - generic [ref=e206]:
+          - generic [ref=e207]: Bluesky
+          - link "username" [ref=e209] [cursor=pointer]:
+            - /url: https://bsky.app/profile/username
+            - text: username
+            - img [ref=e211]
+        - generic [ref=e214]:
+          - generic [ref=e215]: Mastodon
+          - link "username" [ref=e217] [cursor=pointer]:
+            - /url: https://mastodon.social/@username
+            - text: username
+            - img [ref=e219]
+        - generic [ref=e222]:
+          - generic [ref=e223]: X
+          - link "username" [ref=e225] [cursor=pointer]:
+            - /url: https://x.com/username
+            - text: username
+            - img [ref=e227]

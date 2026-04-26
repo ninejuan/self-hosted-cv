@@ -4,6 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { SocialLink } from '@/modules/contact/entities/social-link.entity';
 import { Education } from '@/modules/education/entities/education.entity';
 import { WorkExperience } from '@/modules/experience/entities/work-experience.entity';
+import { Media } from '@/modules/media/entities/media.entity';
 import { SideProject } from '@/modules/project/entities/side-project.entity';
 import { Profile } from '@/modules/profile/entities/profile.entity';
 import { Section } from '@/modules/section/entities/section.entity';
@@ -24,6 +25,7 @@ import { CvService } from './cv.service';
       SideProject,
       Education,
       SocialLink,
+      Media,
     ]),
   ],
   controllers: [CvController],

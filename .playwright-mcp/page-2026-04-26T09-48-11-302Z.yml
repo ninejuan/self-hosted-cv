@@ -1,0 +1,15 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "Admin Login" [level=1] [ref=e5]
+      - paragraph [ref=e6]: Sign in to manage your CV
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: Username
+        - textbox "Username" [ref=e10]:
+          - /placeholder: admin
+      - generic [ref=e11]:
+        - generic [ref=e12]: Password
+        - textbox "Password" [ref=e13]:
+          - /placeholder: ••••••••
+      - button "Sign In" [ref=e14]

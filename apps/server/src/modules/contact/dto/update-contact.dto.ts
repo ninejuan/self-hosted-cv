@@ -26,7 +26,7 @@ export class UpdateContactDto {
   @IsOptional()
   username?: string;
 
-  @IsUrl({ require_protocol: true })
+  @IsUrl({ require_protocol: true, require_tld: false })
   @MaxLength(2048)
   @IsOptional()
   url?: string;

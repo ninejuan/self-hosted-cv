@@ -2,7 +2,7 @@ import { Body, Controller, Get, Put } from '@nestjs/common';
 
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { AppSetting } from './entities/app-setting.entity';
-import { SettingsService } from './settings.service';
+import { SettingsService, SiteSettings } from './settings.service';
 
 @Controller('admin/settings')
 export class SettingsController {
@@ -16,5 +16,25 @@ export class SettingsController {
   @Put()
   update(@Body() dto: UpdateSettingsDto): Promise<AppSetting[]> {
     return this.settingsService.update(dto);
+  }
+
+  @Get('site')
+  getSiteSettings(): Promise<SiteSettings> {
+    return this.settingsService.getSiteSettings();
+  }
+
+  @Put('site')
+  updateSiteSettings(@Body() data: Partial<SiteSettings>): Promise<SiteSettings> {
+    return this.settingsService.updateSiteSettings(data);
+  }
+}
+
+@Controller('site-settings')
+export class PublicSiteSettingsController {
+  constructor(private readonly settingsService: SettingsService) {}
+
+  @Get()
+  getSiteSettings(): Promise<SiteSettings> {
+    return this.settingsService.getSiteSettings();
   }
 }

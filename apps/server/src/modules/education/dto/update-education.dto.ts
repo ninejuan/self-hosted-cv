@@ -9,6 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateEducationDto {
   @IsUUID()
@@ -33,8 +34,9 @@ export class UpdateEducationDto {
   @IsOptional()
   startDate?: string;
 
-  @IsDateString()
+  @Transform(({ value }) => (value === "" ? null : value))
   @IsOptional()
+  @IsDateString({}, { message: "endDate must be a valid date or empty" })
   endDate?: string | null;
 
   @IsString()
@@ -42,7 +44,8 @@ export class UpdateEducationDto {
   @MaxLength(255)
   location?: string | null;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   url?: string | null;

@@ -44,9 +44,22 @@ export default function ProfileEditor() {
         if (!profile) return;
         setSaving(true);
         try {
+            const { name, profession, location, bio, avatarUrl, slug, status, theme } = profile;
             await adminFetch("/api/admin/profile", {
                 method: "PUT",
-                body: profile,
+                body: {
+                    name,
+                    profession,
+                    location,
+                    website: profile.websiteUrl ?? null,
+                    bio,
+                    avatarUrl,
+                    slug,
+                    metaTitle: profile.meta_title ?? null,
+                    metaDescription: profile.meta_description ?? null,
+                    status,
+                    theme,
+                },
             });
             toast.success("Profile saved");
         } catch (err) {

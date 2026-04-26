@@ -8,6 +8,7 @@ import { AppSetting } from '@/modules/settings/entities/app-setting.entity';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AdminBootstrapService } from './admin-bootstrap.service';
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { AuthService } from './auth.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, AdminBootstrapService],
 })
 export class AuthModule {}

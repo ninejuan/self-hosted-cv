@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Profile } from '@/modules/profile/entities/profile.entity';
+import { Section } from '@/modules/section/entities/section.entity';
+import { SectionType } from '@/database/enums';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { getConnectionToken } from '@nestjs/sequelize';
+import { Inject } from '@nestjs/common';
 
 import { CreateSpeakingDto } from './dto/create-speaking.dto';
 import { ReorderDto } from './dto/reorder.dto';
@@ -11,8 +16,41 @@ import { Speaking } from './entities/speaking.entity';
 export class SpeakingService {
   constructor(
     @InjectModel(Speaking) private readonly speakingModel: typeof Speaking,
-    private readonly sequelize: Sequelize,
+    @Inject(getConnectionToken()) private readonly sequelize: Sequelize,
+    @InjectModel(Profile) private readonly profileModel: typeof Profile,
+    @InjectModel(Section) private readonly sectionModel: typeof Section,
   ) {}
+
+  private async resolveIds(dto: { profileId?: string; sectionId?: string }): Promise<{ profileId: string; sectionId: string }> {
+    let profileId = dto.profileId;
+    let sectionId = dto.sectionId;
+
+    if (!profileId) {
+      const profile = await this.profileModel.findOne({ order: [['createdAt', 'ASC']] });
+      if (!profile) throw new NotFoundException('No profile found. Create a profile first.');
+      profileId = profile.id;
+    }
+
+    if (!sectionId) {
+      const section = await this.sectionModel.findOne({
+        where: { profileId, type: SectionType.Speaking },
+      });
+      if (section) {
+        sectionId = section.id;
+      } else {
+        const created = await this.sectionModel.create({
+          profileId,
+          type: 'speaking' as SectionType,
+          title: 'Speaking',
+          sortOrder: 0,
+          visible: true,
+        });
+        sectionId = created.id;
+      }
+    }
+
+    return { profileId, sectionId };
+  }
 
   findAll(): Promise<Speaking[]> {
     return this.speakingModel.findAll({
@@ -23,9 +61,13 @@ export class SpeakingService {
     });
   }
 
-  create(dto: CreateSpeakingDto): Promise<Speaking> {
+  async create(dto: CreateSpeakingDto): Promise<Speaking> {
+    const { profileId, sectionId } = await this.resolveIds(dto);
+
     return this.speakingModel.create({
       ...dto,
+      profileId,
+      sectionId,
       sortOrder: dto.sortOrder ?? 0,
       visible: dto.visible ?? true,
     });

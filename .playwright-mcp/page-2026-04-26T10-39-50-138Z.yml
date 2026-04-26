@@ -1,0 +1,199 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - heading "Sara Lawrence" [level=1] [ref=e6]
+    - paragraph [ref=e8]: Design in San Francisco
+    - paragraph [ref=e11]: website.com
+    - generic [ref=e12]:
+      - img "Sara Lawrence headshot"
+  - generic [ref=e13]:
+    - main [ref=e14]:
+      - region "About me section" [ref=e15]:
+        - heading "About" [level=2] [ref=e17]
+        - paragraph [ref=e19]: I’m a passionate UX designer striving to create intuitive and engaging experiences. I’m a big believer that things can always be simpler than we think.
+      - region "Work experiences" [ref=e20]:
+        - heading "Work Experience" [level=2] [ref=e22]
+        - region "Work experience entry 1" [ref=e23]:
+          - paragraph [ref=e25]: 2017 — Now
+          - generic [ref=e26]:
+            - link "Senior Designer at Magic Design Co" [ref=e27] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e29]: Senior Designer at Magic Design Co
+            - paragraph [ref=e34]: San Francisco, CA
+        - generic [ref=e35]:
+          - paragraph [ref=e37]: 2015 — 2017
+          - generic [ref=e38]:
+            - link "Junior Designer at Creative Co" [ref=e39] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e41]: Junior Designer at Creative Co
+            - paragraph [ref=e46]: Atlanta, GA
+        - generic [ref=e49]:
+          - generic [ref=e51]:
+            - img "Visual example 2 of design work - wall of paintings"
+          - generic [ref=e53]:
+            - img "Visual example of design work - rainbow sculpture"
+          - generic [ref=e55]:
+            - img "visual example 3 of design work - two tone sculptures"
+        - region "Work experience entry 3" [ref=e56]:
+          - paragraph [ref=e58]: 2014 — 2015
+          - generic [ref=e59]:
+            - link "Intern at Design Hub" [ref=e60] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e62]: Intern at Design Hub
+            - paragraph [ref=e67]: Atlanta, GA
+        - region "Work experience entry" [ref=e68]:
+          - paragraph [ref=e70]: 2012 — 2014
+          - generic [ref=e71]:
+            - link "Freelance Graphic Designer" [ref=e72] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e74]: Freelance Graphic Designer
+            - paragraph [ref=e79]: Remote
+        - region "Work experience entry 4" [ref=e80]:
+          - paragraph [ref=e82]: 2010 — 2012
+          - generic [ref=e83]:
+            - link "Art Assistant at Studio X" [ref=e84] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e86]: Art Assistant at Studio X
+            - paragraph [ref=e91]: Cincinnati, OH
+        - region "Work experience entry 5" [ref=e92]:
+          - paragraph [ref=e94]: 2008 — 2010
+          - generic [ref=e95]:
+            - link "Volunteer Designer at Nonprofit Y" [ref=e96] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e98]: Volunteer Designer at Nonprofit Y
+            - paragraph [ref=e103]: Cincinnati, OH
+      - region "Writing experiences" [ref=e104]:
+        - heading "Writing" [level=2] [ref=e106]
+        - region "Writing experience entry 1" [ref=e107]:
+          - paragraph [ref=e109]: "2023"
+          - generic [ref=e110]:
+            - link "Exploring the Intersection of Design and Technology" [ref=e111] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e113]: Exploring the Intersection of Design and Technology
+            - paragraph [ref=e118]: Collaboration with Mia, Leo, and Ava
+        - region "Link to writing experience example" [ref=e119]:
+          - generic [ref=e121]:
+            - generic [ref=e122]:
+              - paragraph [ref=e124]: This is a site title that can go…
+              - paragraph [ref=e126]: 1 min read
+            - generic [ref=e127]:
+              - img "Illustration of multiple iphone screens"
+        - region "Writing experience entry 2" [ref=e128]:
+          - paragraph [ref=e130]: "2023"
+          - generic [ref=e131]:
+            - link "Understanding Design Hierarchies" [ref=e132] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e134]: Understanding Design Hierarchies
+            - paragraph [ref=e139]: Worked alongside Alex
+        - region "Writing experience entry 3" [ref=e140]:
+          - paragraph [ref=e142]: "2020"
+          - link "The Art of User-Centered Design" [ref=e144] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e146]: The Art of User-Centered Design
+        - region "Writing experience entry 4" [ref=e150]:
+          - paragraph [ref=e152]: "2019"
+          - link "Navigating Design Challenges" [ref=e154] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e156]: Navigating Design Challenges
+        - region "Writing experience entry 5" [ref=e160]:
+          - paragraph [ref=e162]: "2018"
+          - link "Crafting Engaging User Experiences" [ref=e164] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e166]: Crafting Engaging User Experiences
+        - region "Writing experience entry 6" [ref=e170]:
+          - paragraph [ref=e172]: "2018"
+          - link "Building a Cohesive Design Language" [ref=e174] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e176]: Building a Cohesive Design Language
+        - region "Writing experience entry 7" [ref=e180]:
+          - paragraph [ref=e182]: "2017"
+          - link "The Power of Visual Storytelling" [ref=e184] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e186]: The Power of Visual Storytelling
+      - region "Speaking experiences" [ref=e190]:
+        - paragraph [ref=e192]: Speaking
+        - region "Speaking experience entry 1" [ref=e193]:
+          - paragraph [ref=e195]: "2024"
+          - generic [ref=e196]:
+            - link "Designing for accessibility" [ref=e197] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e199]: Designing for accessibility
+            - paragraph [ref=e204]: Los Angeles, CA
+        - region "Speaking experience entry 2" [ref=e205]:
+          - paragraph [ref=e207]: "2024"
+          - generic [ref=e208]:
+            - link "How to make things super simple" [ref=e209] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e211]: How to make things super simple
+            - paragraph [ref=e216]: Miami, FL
+        - region "Speaking experience entry 3" [ref=e217]:
+          - paragraph [ref=e219]: "2023"
+          - link "Designing your career" [ref=e221] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e223]: Designing your career
+      - generic [ref=e227]:
+        - heading "Side Projects" [level=2] [ref=e229]
+        - region "Side experience entry 1" [ref=e230]:
+          - paragraph [ref=e232]: "2021"
+          - link "Nature walks" [ref=e234] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e236]: Nature walks
+        - region "Side experience entry 2" [ref=e240]:
+          - paragraph [ref=e242]: "2020"
+          - link "Plant-based cookware" [ref=e244] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e246]: Plant-based cookware
+        - region "Side experience entry 3" [ref=e250]:
+          - paragraph [ref=e252]: "2019"
+          - link "Interactive art installation" [ref=e254] [cursor=pointer]:
+            - /url: https://figma.com/
+            - paragraph [ref=e256]: Interactive art installation
+      - generic [ref=e260]:
+        - heading "Education" [level=2] [ref=e262]
+        - region "Education experience entry 1" [ref=e263]:
+          - paragraph [ref=e265]: 2010 — 2010
+          - generic [ref=e266]:
+            - link "Master’s in Interaction Design at Georgia Tech" [ref=e267] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e269]: Master’s in Interaction Design at Georgia Tech
+            - paragraph [ref=e271]: Atlanta, GA
+        - region "Education experience entry 2" [ref=e272]:
+          - paragraph [ref=e274]: 2006 — 2010
+          - generic [ref=e275]:
+            - link "Bachelor’s in Communication Design at University of Cincinnati" [ref=e276] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e278]: Bachelor’s in Communication Design at University of Cincinnati
+            - paragraph [ref=e280]: Cincinnati, OH
+    - contentinfo [ref=e281]:
+      - generic [ref=e282]:
+        - heading "Contact" [level=2] [ref=e284]
+        - generic [ref=e285]:
+          - generic [ref=e286]:
+            - paragraph [ref=e288]: Threads
+            - link "username" [ref=e290] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e292]: username
+          - generic [ref=e296]:
+            - paragraph [ref=e298]: Figma
+            - link "username" [ref=e300] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e302]: username
+          - generic [ref=e306]:
+            - paragraph [ref=e308]: Instagram
+            - link "username" [ref=e310] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e312]: username
+          - generic [ref=e316]:
+            - paragraph [ref=e318]: Bluesky
+            - link "username" [ref=e320] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e322]: username
+          - generic [ref=e326]:
+            - paragraph [ref=e328]: Mastodon
+            - link "username" [ref=e330] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e332]: username
+          - generic [ref=e336]:
+            - paragraph [ref=e338]: X
+            - link "username" [ref=e340] [cursor=pointer]:
+              - /url: https://figma.com/
+              - paragraph [ref=e342]: username

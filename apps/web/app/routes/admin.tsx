@@ -65,7 +65,7 @@ export default function AdminLayout() {
                 onLogout={handleLogout}
             />
 
-            <div className="flex flex-1 flex-col min-w-0">
+            <div className="flex flex-1 flex-col min-w-0 lg:ml-60">
                 <header className="flex h-14 items-center gap-3 border-b border-[var(--color-border)] px-4 lg:px-6">
                     <SidebarToggle onClick={() => setSidebarOpen(true)} />
                     <span className="text-[13px] font-medium text-[var(--color-text-muted)] lg:hidden">

@@ -9,6 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateProjectDto {
   @IsUUID()
@@ -24,7 +25,8 @@ export class UpdateProjectDto {
   @IsOptional()
   name?: string;
 
-  @IsUrl({ require_protocol: true })
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
   url?: string | null;

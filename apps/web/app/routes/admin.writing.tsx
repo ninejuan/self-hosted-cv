@@ -71,7 +71,7 @@ export default function WritingEditor() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        adminFetch<Writing[]>("/api/admin/writing")
+        adminFetch<Writing[]>("/api/admin/writings")
             .then(setItems)
             .catch(() => toast.error("Failed to load writing"))
             .finally(() => setLoading(false));
@@ -84,7 +84,7 @@ export default function WritingEditor() {
     return (
         <SectionEditor<Writing>
             title="Writing"
-            apiPath="/api/admin/writing"
+            apiPath="/api/admin/writings"
             items={items}
             onItemsChange={setItems}
             createEmpty={() => ({ title: "", date: "" } as Omit<Writing, "id">)}

@@ -37,8 +37,8 @@ export default function AdminDashboard() {
     const [data, setData] = useState<DashboardData | null>(null);
 
     useEffect(() => {
-        adminFetch<DashboardData>("/api/admin/dashboard")
-            .then(setData)
+        adminFetch<DashboardData["profile"]>("/api/admin/profile")
+            .then((profile) => setData({ profile, counts: {} }))
             .catch(() => setData({ counts: {} }));
     }, []);
 

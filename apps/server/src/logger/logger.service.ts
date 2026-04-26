@@ -32,8 +32,8 @@ export class LoggerService implements NestLoggerService {
   private readonly env: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.service = this.configService.getOrThrow<string>('SERVICE_NAME');
-    this.env = this.configService.getOrThrow<string>('NODE_ENV');
+    this.service = this.configService.get<string>('APP_URL') ?? 'cv-server';
+    this.env = this.configService.get<string>('NODE_ENV') ?? 'development';
   }
 
   runWithContext<T>(context: RequestLogContext, callback: () => T): T {

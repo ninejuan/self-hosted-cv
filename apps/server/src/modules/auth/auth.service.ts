@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -20,7 +19,6 @@ const TOTP_WINDOW = 1;
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly configService: ConfigService,
     private readonly auditService: AuditService,
     @InjectModel(AppSetting) private readonly settingModel: typeof AppSetting,
   ) {}
@@ -29,13 +27,20 @@ export class AuthService {
     dto: LoginDto,
     request: Request,
   ): Promise<{ isAuthenticated: true; username: string }> {
-    const adminUsername =
-      this.configService.getOrThrow<string>('ADMIN_USERNAME');
-    const passwordHash = this.configService.getOrThrow<string>(
-      'ADMIN_PASSWORD_HASH',
-    );
-    const isUsernameValid = dto.username === adminUsername;
-    const isPasswordValid = await bcrypt.compare(dto.password, passwordHash);
+    const adminUsernameSetting = await this.settingModel.findOne({
+      where: { key: 'admin_username' },
+    });
+    const adminPasswordSetting = await this.settingModel.findOne({
+      where: { key: 'admin_password_hash' },
+    });
+    const adminUsername = adminUsernameSetting?.value?.username as
+      | string
+      | undefined;
+    const adminHash = adminPasswordSetting?.value?.hash as string | undefined;
+
+    const isUsernameValid = !!adminUsername && dto.username === adminUsername;
+    const isPasswordValid =
+      !!adminHash && (await bcrypt.compare(dto.password, adminHash));
 
     if (!isUsernameValid || !isPasswordValid) {
       await this.auditService.record({
@@ -85,8 +90,11 @@ export class AuthService {
   }
 
   async setupTwoFactor(): Promise<{ secret: string; qrCodeDataUrl: string }> {
+    const usernameSetting = await this.settingModel.findOne({
+      where: { key: 'admin_username' },
+    });
     const adminUsername =
-      this.configService.getOrThrow<string>('ADMIN_USERNAME');
+      (usernameSetting?.value?.username as string) ?? 'admin';
     const issuer = 'Self-Hosted CV';
     const secret = speakeasy.generateSecret({
       issuer,

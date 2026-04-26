@@ -58,6 +58,9 @@ export class Profile extends Model {
   @Column({ type: DataType.STRING, allowNull: true })
   declare ogImageUrl: string | null;
 
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare faviconUrl: string | null;
+
   @Column({
     type: DataType.ENUM(...Object.values(ProfileStatus)),
     allowNull: false,

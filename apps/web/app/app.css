@@ -21,6 +21,7 @@
     --color-accent: #a8e765;
     --color-tag-bg: #f6f6f6;
     --color-border: #e5e5e5;
+    --color-border-light: #f2f2f2;
 }
 
 .dark {
@@ -31,6 +32,7 @@
     --color-accent: #a8e765;
     --color-tag-bg: #2a2a2a;
     --color-border: #333333;
+    --color-border-light: #2a2a2a;
 }
 
 html {
@@ -45,29 +47,32 @@ body {
     font-family: var(--font-primary);
 }
 
-/* ── CV Page Layout ── */
-
 .cv-page {
     position: relative;
-    max-width: 720px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 55px;
+    max-width: 375px;
     margin: 0 auto;
-    padding: 48px 22px 80px;
+    padding: 70px 22px 24px;
 }
 
 @media (min-width: 730px) {
     .cv-page {
-        padding: 62px 62px 100px;
+        max-width: 724px;
+        padding: 82px 62px;
     }
 }
 
-/* ── Toolbar (theme toggle + print) ── */
-
 .cv-toolbar {
-    position: absolute;
+    position: fixed;
     top: 16px;
     right: 22px;
     display: flex;
     gap: 4px;
+    z-index: 10;
 }
 
 @media (min-width: 730px) {
@@ -76,58 +81,330 @@ body {
     }
 }
 
-/* ── Section Styles ── */
+.cv-header {
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    display: block;
+    height: 93px;
+}
+
+.cv-header-photo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 92px;
+    height: 93px;
+    aspect-ratio: 92 / 93;
+    border-radius: 100px;
+    object-fit: cover;
+    object-position: 50% 50%;
+}
+
+.cv-header-text {
+    position: absolute;
+    left: 108px;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.cv-header-name {
+    font-family: var(--font-primary);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 26px;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    margin: 0;
+    padding-top: 6px;
+}
+
+.cv-header-subtitle {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.cv-header-tag {
+    position: absolute;
+    left: 108px;
+    top: 65px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    padding: 4px 10px 5px;
+    background-color: var(--color-tag-bg);
+    font-family: var(--font-primary);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.cv-header-tag:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.cv-header-no-photo .cv-header-text {
+    left: 0;
+}
+
+.cv-header-no-photo .cv-header-tag {
+    left: 0;
+}
+
+.cv-main {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 58px;
+}
 
 .cv-section {
-    margin-top: 55px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.cv-section-about {
+    gap: 3.98px;
+    padding-bottom: 0.685px;
+}
+
+.cv-section-items-wrapper {
+    gap: 24.7px;
 }
 
 .cv-section-title {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-muted);
-    margin-bottom: 20px;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+    margin: 0;
 }
 
 .cv-section-items {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 24.7px;
+    margin-top: 4px;
 }
 
-/* ── Item Row (date | content) ── */
-
 .cv-item-row {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    align-items: flex-start;
 }
 
 .cv-date-column {
     flex-shrink: 0;
-    width: auto;
-    padding-top: 2px;
+    width: 130px;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    white-space: pre-wrap;
 }
 
 .cv-content-column {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.cv-item-title {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--color-text-primary);
+}
+
+.cv-item-subtitle {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    width: 100%;
+}
+
+.cv-item-link {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 2px;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.8;
+}
+
+.cv-item-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.cv-link-arrow {
+    width: 18px;
+    height: 25px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cv-link-arrow svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-primary);
+}
+
+.cv-item-images {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.cv-item-image-wrapper {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 120px;
+    position: relative;
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cv-item-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+    border-radius: 8px;
+}
+
+.cv-item-image-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.cv-item-image-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.cv-about-text {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    white-space: pre-wrap;
+    width: 100%;
+}
+
+.cv-writing-card {
+    position: relative;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background-color: var(--color-bg);
+    width: 100%;
+    min-height: 70px;
+    margin-top: 8px;
+}
+
+.cv-writing-card-inner {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    position: relative;
+    border-radius: inherit;
+    overflow: clip;
+    border: 1px solid var(--color-border);
+}
+
+.cv-writing-card-image {
+    width: 152px;
+    height: 89px;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: clip;
+}
+
+.cv-writing-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cv-writing-card-body {
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    min-height: 70px;
+}
+
+.cv-writing-card-body .cv-item-subtitle {
+    color: var(--color-text-primary);
+}
+
+.cv-writing-card-body .cv-item-subtitle:last-child {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    margin-top: 2px;
 }
 
 @media (min-width: 730px) {
-    .cv-item-row {
-        flex-direction: row;
-        gap: 0;
+    .cv-header {
+        width: 600px;
     }
 
-    .cv-date-column {
-        width: 130px;
+    .cv-item-images {
+        margin-left: -130px;
+        width: calc(100% + 130px);
     }
 }
-
-/* ── Print Stylesheet ── */
 
 @media print {
     *,
@@ -157,27 +434,11 @@ body {
     }
 
     .cv-section {
-        margin-top: 32px;
         break-inside: avoid;
-    }
-
-    .cv-section-title {
-        font-size: 9pt;
-        margin-bottom: 12px;
-    }
-
-    .cv-section-items {
-        gap: 14px;
     }
 
     .cv-item-row {
-        flex-direction: row;
-        gap: 0;
         break-inside: avoid;
-    }
-
-    .cv-date-column {
-        width: 110px;
     }
 
     a[href]::after {
