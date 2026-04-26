@@ -407,6 +407,18 @@ body {
 }
 
 @media print {
+    :root,
+    .dark {
+        --color-bg: #ffffff;
+        --color-text-primary: #111111;
+        --color-text-secondary: #555555;
+        --color-text-muted: #6d6d6d;
+        --color-accent: #a8e765;
+        --color-tag-bg: #f6f6f6;
+        --color-border: #e5e5e5;
+        --color-border-light: #f2f2f2;
+    }
+
     *,
     *::before,
     *::after {
@@ -442,14 +454,6 @@ body {
     }
 
     a[href]::after {
-        content: " (" attr(href) ")";
-        font-size: 8pt;
-        color: #666;
-        word-break: break-all;
-    }
-
-    a[href^="#"]::after,
-    a[href^="javascript:"]::after {
         content: "";
     }
 
