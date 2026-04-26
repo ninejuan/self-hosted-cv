@@ -15,7 +15,7 @@
         "build:web": "yarn workspace @ninejuan/cv-web build",
         "test:server": "yarn workspace @ninejuan/cv-server test",
         "test:web": "yarn workspace @ninejuan/cv-web typecheck",
-        "lint": "yarn workspaces run lint",
+        "lint": "yarn workspace @ninejuan/cv-server lint",
         "clean": "yarn workspaces run clean"
     },
     "engines": {
