@@ -33,7 +33,17 @@ Self-Hosted CV는 개발자, 창업자, 발표자, 크리에이터가 자신의 
 - Server: NestJS 11, Sequelize, PostgreSQL, Redis, MinIO, Speakeasy TOTP
 - Infra: Docker Compose, Nginx, GitHub Actions, GHCR
 
-### 빠른 시작: Docker Compose
+### 원클릭 설치
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ninejuan/self-hosted-cv/main/install.sh | bash
+```
+
+Docker와 Git만 있으면 자동으로 클론, `.env` 생성, 빌드, 실행까지 완료됩니다. 설치 후 `http://서버IP`로 접속하세요.
+
+자세한 배포 가이드: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
+### 수동 설치: Docker Compose
 
 ```bash
 cp .env.example .env
@@ -128,7 +138,17 @@ Self-Hosted CV is a ReadCV-inspired portfolio platform for people who want to ow
 - Server: NestJS 11, Sequelize, PostgreSQL, Redis, MinIO, Speakeasy TOTP
 - Infra: Docker Compose, Nginx, GitHub Actions, GHCR
 
-### Quick Start: Docker Compose
+### One-Click Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ninejuan/self-hosted-cv/main/install.sh | bash
+```
+
+Requires only Docker and Git. The script clones the repo, generates a secure `.env`, builds, and starts everything. Open `http://your-server-ip` when done.
+
+Full deployment guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
+### Manual Install: Docker Compose
 
 ```bash
 cp .env.example .env
