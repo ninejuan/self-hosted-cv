@@ -1,12 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import {
-  ArrayMinSize,
-  IsArray,
-  IsInt,
-  IsUUID,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsInt, IsUUID, Min, ValidateNested } from 'class-validator';
 
 export class ReorderSectionItemDto {
   @IsUUID()

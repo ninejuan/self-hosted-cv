@@ -25,7 +25,7 @@ export class UpdateWritingDto {
   @IsOptional()
   title?: string;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)
@@ -36,7 +36,7 @@ export class UpdateWritingDto {
   @MaxLength(255)
   collaborators?: string | null;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)

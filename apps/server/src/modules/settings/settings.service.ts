@@ -59,7 +59,10 @@ export class SettingsService {
 
     if (!record?.value) return { ...DEFAULT_SITE_SETTINGS };
 
-    return { ...DEFAULT_SITE_SETTINGS, ...(record.value as Partial<SiteSettings>) };
+    return {
+      ...DEFAULT_SITE_SETTINGS,
+      ...(record.value as Partial<SiteSettings>),
+    };
   }
 
   async updateSiteSettings(data: Partial<SiteSettings>): Promise<SiteSettings> {
@@ -68,7 +71,7 @@ export class SettingsService {
 
     await this.settingModel.upsert({
       key: SITE_SETTINGS_KEY,
-      value: merged as unknown as Record<string, unknown>,
+      value: merged,
     });
 
     return merged;

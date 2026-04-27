@@ -31,9 +31,9 @@ export class CreateEducationDto {
   @IsDateString()
   startDate!: string;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsOptional()
-  @IsDateString({}, { message: "endDate must be a valid date or empty" })
+  @IsDateString({}, { message: 'endDate must be a valid date or empty' })
   endDate?: string | null;
 
   @IsString()
@@ -41,7 +41,7 @@ export class CreateEducationDto {
   @MaxLength(255)
   location?: string | null;
 
-  @Transform(({ value }) => (value === "" ? null : value))
+  @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @IsUrl({ require_protocol: true, require_tld: false })
   @IsOptional()
   @MaxLength(2048)

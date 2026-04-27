@@ -1,169 +1,202 @@
 # Self-Hosted CV
 
-Self-Hosted CV is a ReadCV-inspired portfolio platform for developers, founders, speakers, and creators who want to own their professional profile. It ships with a public CV site, an authenticated admin panel, media uploads, audit logging, Redis-backed sessions and caching, and production-ready Docker deployment assets.
+> ReadCV-inspired, self-hosted CV/portfolio platform with a public profile, admin dashboard, media uploads, LinkedIn import, and Docker Compose deployment.
 
-## Features
+[한국어](#한국어) · [English](#english)
 
-- Public CV endpoint and React Router web app with SEO metadata and JSON-LD.
-- Admin CRUD for profile, sections, work experience, writing, speaking, projects, education, contacts, settings, and LinkedIn imports.
-- Redis caching for `GET /api/cv` with 5-minute TTL and automatic invalidation after admin mutations.
-- Password login with session storage in Redis, CSRF protection, throttling, audit logs, and optional TOTP 2FA.
-- MinIO media upload flow with presigned URLs and hourly cleanup for stale pending uploads.
-- Error boundaries, skeleton loading states, and toast notifications in the web app.
-- GitHub Actions workflows for linting, tests, builds, audits, multi-arch GHCR images, Trivy scans, and GitHub Releases.
+<p align="center">
+    <img src="assets/preview.png" alt="Self-Hosted CV preview" width="900" />
+</p>
 
-## Tech Stack
+---
+
+## 한국어
+
+Self-Hosted CV는 개발자, 창업자, 발표자, 크리에이터가 자신의 프로필과 이력을 직접 소유하고 운영할 수 있는 ReadCV 스타일 포트폴리오 플랫폼입니다. 공개 CV 페이지, 인증 기반 어드민, 이미지 업로드, 감사 로그, Redis 세션/캐시, MinIO 스토리지, Docker Compose 배포 구성을 포함합니다.
+
+### 주요 기능
+
+- ReadCV 스타일 공개 CV 페이지: 프로필, 소개, 경력, 글, 발표, 프로젝트, 학력, 연락처
+- 어드민 대시보드: 전체 섹션 CRUD, 드래그 앤 드롭 정렬, 사이트 설정, 감사 로그 조회
+- 미디어 업로드: MinIO presigned URL 기반 이미지 업로드와 orphan cleanup
+- LinkedIn import: LinkedIn 데이터 아카이브 ZIP 업로드, 미리보기, 선택 반영
+- 인증/보안: Redis 세션, CSRF 보호, Helmet, 로그인 throttling, 선택형 TOTP 2FA
+- 성능/운영: Public CV Redis 캐싱, 자동 마이그레이션, health check, structured logging
+- 사이트 설정: favicon, title, description, OG 이미지, analytics/custom script/css 관리
+- 프린트/PDF: 브라우저 인쇄를 통한 깔끔한 라이트 테마 CV 출력
+- CI/CD: GitHub Actions 기반 lint, test, build, audit, release workflow
+
+### 기술 스택
 
 - Monorepo: Yarn workspaces, Node.js 22+
-- Server: NestJS 11, Sequelize, PostgreSQL, Redis, MinIO, Speakeasy TOTP, `@nestjs/schedule`
 - Web: React 19, React Router v7, Tailwind CSS v4, sonner, lucide-react
-- Infrastructure: Docker Compose, Nginx, GHCR, GitHub Actions
+- Server: NestJS 11, Sequelize, PostgreSQL, Redis, MinIO, Speakeasy TOTP
+- Infra: Docker Compose, Nginx, GitHub Actions, GHCR
 
-## Quick Start with Docker Compose
-
-1. Create `.env` in the project root.
-2. Start the stack:
+### 빠른 시작: Docker Compose
 
 ```bash
+cp .env.example .env
 docker compose -f docker/docker-compose.yml up -d --build
 ```
 
-3. Open the public site at `http://localhost`.
-4. Open the admin panel at `http://localhost/admin`.
+실행 후 접속:
 
-Generate an admin password hash:
+- 공개 사이트: `http://localhost`
+- 어드민: `http://localhost/admin`
+- 기본 계정: `.env`의 `ADMIN_USERNAME`, `ADMIN_PASSWORD`
 
-```bash
-node -e "const bcrypt=require('bcrypt'); bcrypt.hash(process.argv[1], 12).then(console.log)" 'change-me'
-```
+프로덕션에서는 반드시 `.env`의 비밀번호, 세션 시크릿, MinIO 키를 안전한 값으로 변경하세요.
 
-## Development Setup
-
-Install dependencies:
+### 개발 환경 실행
 
 ```bash
 yarn install
-```
-
-Run backing services:
-
-```bash
+cp .env.example .env
 docker compose -f docker/docker-compose.dev.yml up -d postgres redis minio
-```
-
-Run the apps:
-
-```bash
 yarn dev:server
 yarn dev:web
 ```
 
-Useful commands:
+개발 서버 기본 주소:
+
+- Web: `http://localhost:47173`
+- API: `http://localhost:47300`
+- PostgreSQL: `localhost:47532`
+- Redis: `localhost:47379`
+- MinIO: `http://localhost:47900`
+- MinIO Console: `http://localhost:47901`
+
+### 자주 쓰는 명령어
 
 ```bash
 yarn test:server
 yarn test:web
 yarn build:server
 yarn build:web
+yarn lint
 ```
 
-## Environment Variables
+### 환경 변수
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `NODE_ENV` | Yes | `development`, `production`, or `test`. |
-| `SERVICE_NAME` | Yes | Service name used in structured logs. |
-| `PORT` | Yes | NestJS server port. |
-| `DB_HOST` | Yes | PostgreSQL host. |
-| `DB_PORT` | Yes | PostgreSQL port. |
-| `DB_USERNAME` | Yes | PostgreSQL user. |
-| `DB_PASSWORD` | Yes | PostgreSQL password. |
-| `DB_DATABASE` | Yes | PostgreSQL database. |
-| `DB_SCHEMA` | No | Optional PostgreSQL schema. |
-| `DB_SSL` | Yes | `true` for SSL database connections. |
-| `REDIS_HOST` | Yes | Redis host. |
-| `REDIS_PORT` | Yes | Redis port. |
-| `REDIS_PASSWORD` | No | Redis password. |
-| `REDIS_DB` | Yes | Redis database index. |
-| `ADMIN_USERNAME` | Yes | Admin login username. |
-| `ADMIN_PASSWORD_HASH` | Yes | Bcrypt hash for the admin password. |
-| `SESSION_SECRET` | Yes | Long random secret for signed sessions. |
-| `SESSION_IDLE_TIMEOUT` | Yes | Idle session timeout in seconds. |
-| `SESSION_MAX_LIFETIME` | Yes | Maximum session lifetime in seconds. |
-| `LOGIN_MAX_ATTEMPTS` | Yes | Login attempts allowed before throttling. |
-| `LOGIN_LOCKOUT_DURATION` | Yes | Login throttle window in seconds. |
-| `MINIO_INTERNAL_ENDPOINT` | Yes | Server-to-MinIO endpoint. |
-| `MINIO_PUBLIC_ENDPOINT` | Yes | Browser-facing MinIO endpoint. |
-| `MINIO_ACCESS_KEY` | Yes | MinIO access key. |
-| `MINIO_SECRET_KEY` | Yes | MinIO secret key. |
-| `MINIO_BUCKET` | Yes | Bucket for uploaded media. |
-| `VITE_API_URL` | Web | Browser API base path, usually `/api`. |
-| `API_INTERNAL_URL` | Web | SSR/server-to-server API URL. |
+환경 변수는 `.env.example`을 기준으로 설정합니다. 핵심 값은 다음과 같습니다.
 
-## Deployment Guide
+| 구분 | 변수 |
+| --- | --- |
+| App | `NODE_ENV`, `APP_PORT`, `APP_URL`, `APP_VERSION` |
+| Auth | `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET` |
+| Database | `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` |
+| Redis | `REDIS_HOST`, `REDIS_PORT` |
+| MinIO | `MINIO_INTERNAL_ENDPOINT`, `MINIO_PUBLIC_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` |
+| Frontend/SSR | `VITE_API_URL`, `API_INTERNAL_URL`, `CORS_ORIGIN` |
+| Update Check | `GITHUB_REPO`, `DISABLE_UPDATE_CHECK`, `UPDATE_CHECK_INTERVAL` |
 
-### VPS
+전체 예시는 `.env.example`을 확인하세요.
 
-1. Install Docker and Docker Compose.
-2. Clone the repository and create a production `.env`.
-3. Point DNS to the VPS.
-4. Run `docker compose -f docker/docker-compose.yml up -d --build`.
-5. Put TLS in front of Nginx with Caddy, Traefik, or a host-managed reverse proxy.
-6. Back up PostgreSQL and MinIO volumes regularly.
+### 운영 배포 메모
 
-### Cloud
+1. VPS 또는 서버에 Docker와 Docker Compose를 설치합니다.
+2. 저장소를 clone하고 `.env`를 프로덕션 값으로 채웁니다.
+3. `docker compose -f docker/docker-compose.yml up -d --build`로 스택을 시작합니다.
+4. 기본 Compose는 Nginx를 `80` 포트로 노출합니다. TLS는 Caddy, Traefik, Cloudflare, 호스팅사 reverse proxy 등으로 앞단에서 처리하는 구성을 권장합니다.
+5. PostgreSQL volume과 MinIO volume은 주기적으로 백업하세요.
 
-- Use managed PostgreSQL and Redis where possible.
-- Run server and web containers from GHCR:
-  - `ghcr.io/ninejuan/cv-server:<tag>`
-  - `ghcr.io/ninejuan/cv-web:<tag>`
-- Use S3-compatible object storage or MinIO.
-- Configure health checks for `/api/health` and `/`.
+마이그레이션은 서버 부팅 시 자동 실행됩니다. 운영 업그레이드 전에는 release note와 `.env.example` 변경 사항을 확인하세요.
 
-## Updates
+---
+
+## English
+
+Self-Hosted CV is a ReadCV-inspired portfolio platform for people who want to own their professional profile. It includes a public CV page, authenticated admin dashboard, media uploads, audit logs, Redis-backed sessions and caching, MinIO object storage, and Docker Compose deployment assets.
+
+### Features
+
+- ReadCV-style public CV page: profile, about, work experience, writing, speaking, projects, education, and contacts
+- Admin dashboard: full-section CRUD, drag-and-drop ordering, site settings, and audit log viewer
+- Media uploads: MinIO presigned URL flow with orphan cleanup
+- LinkedIn import: upload a LinkedIn archive ZIP, preview detected records, and apply selected data
+- Auth/security: Redis sessions, CSRF protection, Helmet, login throttling, and optional TOTP 2FA
+- Operations: Redis caching for the public CV, automatic migrations, health checks, and structured logging
+- Site settings: favicon, title, description, OG image, analytics/custom script/css management
+- Print/PDF: clean light-theme CV output through the browser print dialog
+- CI/CD: GitHub Actions workflows for linting, tests, builds, audits, and releases
+
+### Tech Stack
+
+- Monorepo: Yarn workspaces, Node.js 22+
+- Web: React 19, React Router v7, Tailwind CSS v4, sonner, lucide-react
+- Server: NestJS 11, Sequelize, PostgreSQL, Redis, MinIO, Speakeasy TOTP
+- Infra: Docker Compose, Nginx, GitHub Actions, GHCR
+
+### Quick Start: Docker Compose
 
 ```bash
-git pull
-yarn install --frozen-lockfile
-yarn build:server
-yarn build:web
+cp .env.example .env
 docker compose -f docker/docker-compose.yml up -d --build
 ```
 
-Database migrations run during server bootstrap. Review release notes before upgrading production.
+Then open:
 
-## TOTP 2FA
+- Public site: `http://localhost`
+- Admin: `http://localhost/admin`
+- Default credentials: `ADMIN_USERNAME` and `ADMIN_PASSWORD` from `.env`
 
-After logging in, call the 2FA setup endpoint from an authenticated session or wire it into your admin UI:
+For production, replace the default password, session secret, and MinIO credentials with secure values before exposing the service.
 
-- `POST /api/auth/2fa/setup` returns `{ secret, qrCodeDataUrl }`.
-- Scan the QR code in an authenticator app.
-- `POST /api/auth/2fa/verify` with `{ "code": "123456" }` enables 2FA.
-- Future `POST /api/auth/login` requests must include `totpCode` after password verification.
-- `POST /api/auth/2fa/disable` disables 2FA after a valid current TOTP code.
+### Development Setup
 
-The server stores `totp_secret` and `totp_enabled` in `app_settings`.
+```bash
+yarn install
+cp .env.example .env
+docker compose -f docker/docker-compose.dev.yml up -d postgres redis minio
+yarn dev:server
+yarn dev:web
+```
 
-## LinkedIn Import Guide
+Default development endpoints:
 
-1. Export your LinkedIn data from LinkedIn settings.
-2. Download the archive ZIP.
-3. Sign in to `/admin`.
-4. Open the LinkedIn import page.
-5. Upload the ZIP, preview detected records, and confirm import.
-6. Review imported sections before publishing.
+- Web: `http://localhost:47173`
+- API: `http://localhost:47300`
+- PostgreSQL: `localhost:47532`
+- Redis: `localhost:47379`
+- MinIO: `http://localhost:47900`
+- MinIO Console: `http://localhost:47901`
 
-## CI and Releases
+### Useful Commands
 
-- `ci.yml` runs lint, server tests, web typecheck, builds, and `yarn audit` on main pushes and pull requests.
-- `release.yml` runs on `v*.*.*` tags, validates the repository, builds multi-arch images, pushes GHCR images, scans with Trivy, and creates a GitHub Release with generated notes.
+```bash
+yarn test:server
+yarn test:web
+yarn build:server
+yarn build:web
+yarn lint
+```
 
-## Contributing
+### Environment Variables
 
-1. Create a feature branch.
-2. Keep changes focused and covered by existing checks.
-3. Run `yarn build:server` and `yarn build:web` before opening a pull request.
-4. Do not commit secrets or local `.env` files.
+Use `.env.example` as the source of truth. Important variables include:
+
+| Area | Variables |
+| --- | --- |
+| App | `NODE_ENV`, `APP_PORT`, `APP_URL`, `APP_VERSION` |
+| Auth | `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET` |
+| Database | `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` |
+| Redis | `REDIS_HOST`, `REDIS_PORT` |
+| MinIO | `MINIO_INTERNAL_ENDPOINT`, `MINIO_PUBLIC_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` |
+| Frontend/SSR | `VITE_API_URL`, `API_INTERNAL_URL`, `CORS_ORIGIN` |
+| Update Check | `GITHUB_REPO`, `DISABLE_UPDATE_CHECK`, `UPDATE_CHECK_INTERVAL` |
+
+See `.env.example` for the full list and defaults.
+
+### Deployment Notes
+
+1. Install Docker and Docker Compose on your VPS or server.
+2. Clone the repository and create a production `.env`.
+3. Start the stack with `docker compose -f docker/docker-compose.yml up -d --build`.
+4. The default Compose stack exposes Nginx on port `80`. Put TLS in front with Caddy, Traefik, Cloudflare, or a host-managed reverse proxy.
+5. Back up PostgreSQL and MinIO volumes regularly.
+
+Database migrations run automatically during server bootstrap. Before upgrading production, review release notes and changes in `.env.example`.
 
 ## License
 
