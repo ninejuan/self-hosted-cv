@@ -56,6 +56,13 @@ async function seed(): Promise<void> {
     const contactSectionId = uuidv4();
 
     await sequelize.transaction(async (transaction) => {
+      const readcvTemplate = await queryInterface.sequelize.query<{
+        id: string;
+      }>("SELECT id FROM cv_templates WHERE key = 'readcv' LIMIT 1", {
+        type: QueryTypes.SELECT,
+        transaction,
+      });
+
       await queryInterface.bulkInsert(
         'profiles',
         [
@@ -76,6 +83,7 @@ async function seed(): Promise<void> {
               'https://images.unsplash.com/photo-1497215728101-856f4ea42174',
             status: 'available',
             theme: 'system',
+            cv_template_id: readcvTemplate[0]?.id ?? null,
             created_at: now,
             updated_at: now,
           },

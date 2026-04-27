@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  IsUUID,
   MaxLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
@@ -74,4 +75,8 @@ export class UpdateProfileDto {
   @IsEnum(ProfileTheme)
   @IsOptional()
   theme?: ProfileTheme;
+
+  @IsUUID()
+  @IsOptional()
+  cvTemplateId?: string;
 }

@@ -13,6 +13,7 @@ import { SideProject } from '@/modules/project/entities/side-project.entity';
 import { Profile } from '@/modules/profile/entities/profile.entity';
 import { Section } from '@/modules/section/entities/section.entity';
 import { Speaking } from '@/modules/speaking/entities/speaking.entity';
+import { CvTemplate } from '@/modules/template/entities/cv-template.entity';
 import { Writing } from '@/modules/writing/entities/writing.entity';
 
 import { CV_CACHE_KEY, CV_CACHE_TTL_SECONDS } from './cv-cache.constants';
@@ -24,8 +25,11 @@ interface CvSectionResponse {
   >;
 }
 
+type JsonRecord = Record<string, unknown>;
+type SerializableModel = { toJSON: () => unknown };
+
 interface CvResponse {
-  profile: Profile;
+  profile: Profile | JsonRecord;
   sections: CvSectionResponse[];
 }
 
@@ -69,6 +73,7 @@ export class CvService {
 
   private async buildCv(): Promise<CvResponse | null> {
     const profile = await this.profileModel.findOne({
+      include: [{ model: CvTemplate, as: 'cvTemplate' }],
       order: [['createdAt', 'ASC']],
     });
 
@@ -91,7 +96,22 @@ export class CvService {
       })),
     );
 
-    return { profile, sections: sectionResponses };
+    const profileJson = this.toJsonRecord(profile);
+    if (profile.cvTemplate) {
+      profileJson.cvTemplate = this.toJsonRecord(profile.cvTemplate);
+    }
+
+    return { profile: profileJson, sections: sectionResponses };
+  }
+
+  private toJsonRecord(model: SerializableModel): JsonRecord {
+    const value = model.toJSON();
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return value as JsonRecord;
+    }
+
+    return {};
   }
 
   private async getSectionItems(

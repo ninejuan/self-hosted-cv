@@ -1,7 +1,9 @@
 import {
+  BelongsTo,
   Column,
   CreatedAt,
   DataType,
+  ForeignKey,
   HasMany,
   Model,
   Table,
@@ -17,6 +19,7 @@ import { SideProject } from '@/modules/project/entities/side-project.entity';
 import { Section } from '@/modules/section/entities/section.entity';
 import { Speaking } from '@/modules/speaking/entities/speaking.entity';
 import { Writing } from '@/modules/writing/entities/writing.entity';
+import { CvTemplate } from '@/modules/template/entities/cv-template.entity';
 import { ProfileStatus, ProfileTheme } from '@/database/enums';
 
 @Table({ tableName: 'profiles', underscored: true })
@@ -75,6 +78,10 @@ export class Profile extends Model {
   })
   declare theme: ProfileTheme;
 
+  @ForeignKey(() => CvTemplate)
+  @Column({ type: DataType.UUID, allowNull: false })
+  declare cvTemplateId: string;
+
   @CreatedAt
   declare createdAt: Date;
 
@@ -83,6 +90,9 @@ export class Profile extends Model {
 
   @HasMany(() => Section)
   declare sections?: Section[];
+
+  @BelongsTo(() => CvTemplate, { as: 'cvTemplate' })
+  declare cvTemplate?: CvTemplate;
 
   @HasMany(() => WorkExperience)
   declare workExperiences?: WorkExperience[];

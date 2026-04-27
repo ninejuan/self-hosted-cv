@@ -40,6 +40,8 @@ import { AppSetting } from '@/modules/settings/entities/app-setting.entity';
 import { SettingsModule } from '@/modules/settings/settings.module';
 import { Speaking } from '@/modules/speaking/entities/speaking.entity';
 import { SpeakingModule } from '@/modules/speaking/speaking.module';
+import { CvTemplate } from '@/modules/template/entities/cv-template.entity';
+import { TemplateModule } from '@/modules/template/template.module';
 import { UpdateCheckerModule } from '@/modules/update-checker/update-checker.module';
 import { Writing } from '@/modules/writing/entities/writing.entity';
 import { WritingModule } from '@/modules/writing/writing.module';
@@ -70,6 +72,7 @@ import { WritingModule } from '@/modules/writing/writing.module';
           Media,
           AuditLog,
           AppSetting,
+          CvTemplate,
         ],
       }),
     }),
@@ -95,6 +98,7 @@ import { WritingModule } from '@/modules/writing/writing.module';
     CvModule,
     UpdateCheckerModule,
     SettingsModule,
+    TemplateModule,
     LinkedinModule,
   ],
   providers: [
