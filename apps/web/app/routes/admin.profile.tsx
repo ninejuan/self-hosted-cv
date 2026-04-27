@@ -7,15 +7,21 @@ import { Loader2, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AdminProfile } from "@/types/admin";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+    DEFAULT_CV_TEMPLATE,
+    FALLBACK_CV_TEMPLATES,
+    type CVTemplateMetadata,
+} from "@/lib/cv-templates";
 
 export function meta() {
     return [{ title: "Profile — Self-Hosted CV" }];
 }
 
 const STATUS_OPTIONS = [
-    { value: "active", label: "Active" },
-    { value: "draft", label: "Draft" },
-    { value: "archived", label: "Archived" },
+    { value: "available", label: "Available" },
+    { value: "busy", label: "Busy" },
+    { value: "away", label: "Away" },
+    { value: "none", label: "None" },
 ];
 
 const THEME_OPTIONS = [
@@ -26,11 +32,19 @@ const THEME_OPTIONS = [
 
 export default function ProfileEditor() {
     const [profile, setProfile] = useState<AdminProfile | null>(null);
+    const [templates, setTemplates] = useState<CVTemplateMetadata[]>([...FALLBACK_CV_TEMPLATES]);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        adminFetch<AdminProfile>("/api/admin/profile")
-            .then(setProfile)
+        Promise.all([
+            adminFetch<AdminProfile>("/api/admin/profile"),
+            adminFetch<CVTemplateMetadata[]>("/api/admin/templates").catch(() => [...FALLBACK_CV_TEMPLATES]),
+        ])
+            .then(([profileData, templateData]) => {
+                const availableTemplates = templateData.length > 0 ? templateData : [...FALLBACK_CV_TEMPLATES];
+                setTemplates(availableTemplates);
+                setProfile(normalizeAdminProfileTemplate(profileData, availableTemplates));
+            })
             .catch(() => toast.error("Failed to load profile"));
     }, []);
 
@@ -39,13 +53,13 @@ export default function ProfileEditor() {
         setProfile({ ...profile, [field]: value });
     }
 
-    async function handleSave(e: React.FormEvent) {
+    async function handleSave(e: { preventDefault: () => void }) {
         e.preventDefault();
         if (!profile) return;
         setSaving(true);
         try {
-            const { name, profession, location, bio, avatarUrl, slug, status, theme } = profile;
-            await adminFetch("/api/admin/profile", {
+            const { name, profession, location, bio, avatarUrl, slug, status, theme, cvTemplateId } = profile;
+            const updatedProfile = await adminFetch<AdminProfile>("/api/admin/profile", {
                 method: "PUT",
                 body: {
                     name,
@@ -59,8 +73,10 @@ export default function ProfileEditor() {
                     metaDescription: profile.meta_description ?? null,
                     status,
                     theme,
+                    cvTemplateId,
                 },
             });
+            setProfile(normalizeAdminProfileTemplate(updatedProfile, templates));
             toast.success("Profile saved");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Save failed");
@@ -145,7 +161,7 @@ export default function ProfileEditor() {
                     <SelectField
                         label="Status"
                         options={STATUS_OPTIONS}
-                        value={profile.status ?? "active"}
+                        value={profile.status ?? "available"}
                         onChange={(e) => update("status", e.target.value)}
                     />
                     <SelectField
@@ -153,6 +169,15 @@ export default function ProfileEditor() {
                         options={THEME_OPTIONS}
                         value={profile.theme ?? "system"}
                         onChange={(e) => update("theme", e.target.value)}
+                    />
+                    <SelectField
+                        label="Default CV Template"
+                        options={templates.map((template) => ({
+                            value: template.id,
+                            label: template.label,
+                        }))}
+                        value={profile.cvTemplateId ?? templates.find((template) => template.key === DEFAULT_CV_TEMPLATE)?.id ?? ""}
+                        onChange={(e) => update("cvTemplateId", e.target.value)}
                     />
                 </div>
 
@@ -198,4 +223,23 @@ export default function ProfileEditor() {
             </form>
         </div>
     );
+}
+
+function normalizeAdminProfileTemplate(
+    profile: AdminProfile,
+    templates: CVTemplateMetadata[],
+): AdminProfile {
+    const cvTemplateObj = typeof profile.cvTemplate === "object" ? profile.cvTemplate : null;
+    const currentKey = cvTemplateObj?.key ?? (typeof profile.cvTemplate === "string" ? profile.cvTemplate : undefined);
+
+    const matchedTemplate =
+        templates.find((t) => t.id === profile.cvTemplateId)
+        ?? (currentKey ? templates.find((t) => t.key === currentKey) : undefined)
+        ?? templates.find((t) => t.key === DEFAULT_CV_TEMPLATE);
+
+    return {
+        ...profile,
+        cvTemplateId: matchedTemplate?.id ?? profile.cvTemplateId,
+        cvTemplate: matchedTemplate?.key ?? currentKey ?? DEFAULT_CV_TEMPLATE,
+    };
 }

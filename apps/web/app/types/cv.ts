@@ -1,3 +1,5 @@
+import type { CVTemplateKey, CVTemplateMetadata } from "@/lib/cv-templates";
+
 export interface Media {
     url: string;
     alt?: string;
@@ -18,6 +20,9 @@ export interface Profile {
     avatarUrl?: string;
     websiteUrl?: string;
     websiteLabel?: string;
+    cvTemplateId?: string;
+    cvTemplate: CVTemplateKey;
+    cvTemplateMeta?: CVTemplateMetadata;
     socialLinks: SocialLink[];
 }
 
