@@ -220,4 +220,4 @@ Database migrations run automatically during server bootstrap. Before upgrading 
 
 ## License
 
-MIT
+Apache License 2.0 — see [LICENSE](LICENSE) for details.

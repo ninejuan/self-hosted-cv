@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "${GIT_MASTER:-}" = "1" ]; then
+    exit 0
+fi
+
+echo "[pre-commit] Running lint..."
+
+if ! yarn lint 2>&1; then
+    echo ""
+    echo "[pre-commit] Lint failed. Commit blocked."
+    echo "[pre-commit] Run 'yarn lint' to see and fix errors."
+    exit 1
+fi
+
+echo "[pre-commit] Running web typecheck..."
+
+if ! yarn test:web 2>&1; then
+    echo ""
+    echo "[pre-commit] Web typecheck failed. Commit blocked."
+    echo "[pre-commit] Run 'yarn test:web' to see errors."
+    exit 1
+fi
+
+echo "[pre-commit] All checks passed."
