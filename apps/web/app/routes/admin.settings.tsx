@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/admin-api";
 import { toast } from "sonner";
 import { Loader2, Trash2, Shield, Info, Globe, Save } from "lucide-react";
+import { ImageUploader } from "@/components/admin/image-uploader";
 import { cn } from "@/lib/utils";
 
 interface SiteSettings {
@@ -167,7 +168,14 @@ export default function SettingsPage() {
                                 <Field label="Site Description" value={site.siteDescription} onChange={(v) => updateSite("siteDescription", v)} placeholder="Personal portfolio" />
                             </div>
 
-                            <Field label="Favicon URL" value={site.faviconUrl} onChange={(v) => updateSite("faviconUrl", v)} placeholder="https://..." />
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[12px] font-medium text-[var(--color-text-muted)]">Favicon</span>
+                                <ImageUploader
+                                    value={site.faviconUrl || undefined}
+                                    onChange={(url) => updateSite("faviconUrl", url)}
+                                    purpose="favicon"
+                                />
+                            </div>
 
                             <div className="mt-2 border-t border-[var(--color-border)] pt-4">
                                 <p className="mb-3 text-[12px] font-medium text-[var(--color-text-muted)]">Open Graph</p>
