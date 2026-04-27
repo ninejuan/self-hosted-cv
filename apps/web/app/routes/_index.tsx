@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
 import type { Route } from "./+types/_index";
-import { fetchCV } from "@/lib/api";
+import { fetchCV, fetchTemplates } from "@/lib/api";
 import type { CVData } from "@/types/cv";
 import { Header } from "@/components/cv/header";
 import { About } from "@/components/cv/about";
@@ -13,10 +13,15 @@ import { ContactSection } from "@/components/cv/contact-section";
 import { ThemeToggle } from "@/components/cv/theme-toggle";
 import { PrintButton } from "@/components/cv/print-button";
 import { CvPageSkeleton } from "@/components/cv/cv-skeleton";
+import { getTemplateClassName, parseCVTemplateKey } from "@/lib/cv-templates";
 
-export async function loader() {
-    const cv = await fetchCV();
-    return { cv };
+export async function loader({ request }: Route.LoaderArgs) {
+    const [cv, templates] = await Promise.all([fetchCV(), fetchTemplates()]);
+    const requestedTemplate = new URL(request.url).searchParams.get("template");
+    const template = requestedTemplate
+        ? parseCVTemplateKey(requestedTemplate, templates)
+        : parseCVTemplateKey(cv?.profile.cvTemplate, templates);
+    return { cv, template };
 }
 
 export function meta({ loaderData }: Route.MetaArgs) {
@@ -140,16 +145,18 @@ function WelcomePage() {
 }
 
 export default function Index() {
-    const { cv } = useLoaderData<typeof loader>();
+    const { cv, template } = useLoaderData<typeof loader>();
 
     if (!cv) {
         return <WelcomePage />;
     }
 
+    const pageClassName = `cv-page ${getTemplateClassName(template)}`;
+
     return (
         <>
             <JsonLd cv={cv} />
-            <main className="cv-page">
+            <main className={pageClassName} data-cv-template={template}>
                 <div className="cv-toolbar">
                     <ThemeToggle />
                     <PrintButton />

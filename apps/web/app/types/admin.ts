@@ -1,9 +1,12 @@
 import type { Profile, WorkExperience, Writing, Speaking, SideProject, Education, SocialLink } from "./cv";
+import type { CVTemplateMetadata } from "@/lib/cv-templates";
 
-export interface AdminProfile extends Profile {
+export interface AdminProfile extends Omit<Profile, "cvTemplate" | "cvTemplateMeta"> {
     slug?: string;
-    status?: "active" | "draft" | "archived";
+    status?: "available" | "busy" | "away" | "none";
     theme?: "light" | "dark" | "system";
+    cvTemplateId?: string;
+    cvTemplate?: string | CVTemplateMetadata;
     meta_title?: string;
     meta_description?: string;
 }

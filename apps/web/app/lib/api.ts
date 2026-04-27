@@ -1,4 +1,9 @@
 import type { CVData } from "@/types/cv";
+import {
+    FALLBACK_CV_TEMPLATES,
+    parseCVTemplateKey,
+    type CVTemplateMetadata,
+} from "@/lib/cv-templates";
 
 type ServerSection = {
     section?: { type?: string };
@@ -9,6 +14,8 @@ type ServerCVResponse = {
     profile?: Record<string, unknown> | null;
     sections?: ServerSection[];
 };
+
+type ServerTemplate = Record<string, unknown>;
 
 function getBaseUrl(isServer: boolean): string {
     if (isServer) {
@@ -45,9 +52,39 @@ export async function fetchCV(): Promise<CVData | null> {
     }
 }
 
+export async function fetchTemplates(): Promise<CVTemplateMetadata[]> {
+    const isServer = typeof window === "undefined";
+    const baseUrl = getBaseUrl(isServer);
+
+    try {
+        const res = await fetch(`${baseUrl}/api/templates`, {
+            headers: { Accept: "application/json" },
+        });
+
+        if (!res.ok) {
+            return [...FALLBACK_CV_TEMPLATES];
+        }
+
+        const data = await res.json() as ServerTemplate[];
+        const templates = data.map(normalizeTemplate).filter((template) => template.isActive);
+        return templates.length > 0 ? templates : [...FALLBACK_CV_TEMPLATES];
+    } catch {
+        return [...FALLBACK_CV_TEMPLATES];
+    }
+}
+
 function normalizeCV(data: ServerCVResponse): CVData {
     const profile = data.profile ?? {};
     const sections = data.sections ?? [];
+    const templateMeta = recordValue(profile.cvTemplate)
+        ?? recordValue(profile.template)
+        ?? recordValue(profile.cv_template);
+    const templateKey = parseCVTemplateKey(
+        optionalString(templateMeta?.key)
+            ?? optionalString(profile.cvTemplate)
+            ?? optionalString(profile.cvTemplateKey)
+            ?? optionalString(profile.templateKey),
+    );
 
     return {
         profile: {
@@ -58,6 +95,9 @@ function normalizeCV(data: ServerCVResponse): CVData {
             avatarUrl: optionalString(profile.avatarUrl),
             websiteUrl: optionalString(profile.website),
             websiteLabel: optionalString(profile.website)?.replace(/^https?:\/\//, ""),
+            cvTemplateId: optionalString(profile.cvTemplateId),
+            cvTemplate: templateKey,
+            cvTemplateMeta: templateMeta ? normalizeTemplate(templateMeta) : undefined,
             socialLinks: sectionItems(sections, "contact").map((item) => ({
                 platform: stringValue(item.platform),
                 url: stringValue(item.url),
@@ -124,6 +164,20 @@ function normalizeCV(data: ServerCVResponse): CVData {
     };
 }
 
+function normalizeTemplate(template: ServerTemplate): CVTemplateMetadata {
+    return {
+        id: stringValue(template.id) || stringValue(template.key),
+        key: stringValue(template.key),
+        label: stringValue(template.label),
+        description: stringValue(template.description),
+        previewImageUrl: optionalString(template.previewImageUrl) ?? null,
+        isActive: typeof template.isActive === "boolean" ? template.isActive : true,
+        visibility: stringValue(template.visibility) || "public",
+        version: stringValue(template.version) || "1.0.0",
+        sortOrder: typeof template.sortOrder === "number" ? template.sortOrder : 0,
+    };
+}
+
 function sectionItems(sections: ServerSection[], type: string): Array<Record<string, unknown>> {
     return sections.find((entry) => entry.section?.type === type)?.items ?? [];
 }
@@ -134,4 +188,10 @@ function stringValue(value: unknown): string {
 
 function optionalString(value: unknown): string | undefined {
     return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function recordValue(value: unknown): Record<string, unknown> | undefined {
+    return value && typeof value === "object" && !Array.isArray(value)
+        ? value as Record<string, unknown>
+        : undefined;
 }

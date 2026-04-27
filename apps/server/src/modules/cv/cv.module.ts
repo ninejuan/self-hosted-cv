@@ -9,6 +9,7 @@ import { SideProject } from '@/modules/project/entities/side-project.entity';
 import { Profile } from '@/modules/profile/entities/profile.entity';
 import { Section } from '@/modules/section/entities/section.entity';
 import { Speaking } from '@/modules/speaking/entities/speaking.entity';
+import { CvTemplate } from '@/modules/template/entities/cv-template.entity';
 import { Writing } from '@/modules/writing/entities/writing.entity';
 
 import { CvController } from './cv.controller';
@@ -26,6 +27,7 @@ import { CvService } from './cv.service';
       Education,
       SocialLink,
       Media,
+      CvTemplate,
     ]),
   ],
   controllers: [CvController],

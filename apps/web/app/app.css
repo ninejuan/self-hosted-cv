@@ -318,15 +318,6 @@ body {
     pointer-events: none;
 }
 
-.cv-item-image-wrapper::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    pointer-events: none;
-}
-
 .cv-about-text {
     font-family: var(--font-primary);
     font-size: 14px;
@@ -395,12 +386,390 @@ body {
     margin-top: 2px;
 }
 
+.cv-template-ats,
+.cv-template-compact,
+.cv-template-academic,
+.cv-template-executive,
+.cv-template-portfolio,
+.cv-template-timeline,
+.cv-template-skills {
+    --template-page-width: 720px;
+    --template-page-gap: 28px;
+    --template-main-gap: 24px;
+    --template-section-gap: 8px;
+    --template-item-gap: 11px;
+    --template-date-width: 112px;
+    --template-body-size: 13px;
+    --template-body-line: 1.55;
+    --template-title-size: 13px;
+    --template-heading-size: 13px;
+    --template-heading-weight: 700;
+    --template-name-size: 28px;
+    --template-name-weight: 800;
+    max-width: var(--template-page-width);
+    gap: var(--template-page-gap);
+    padding-top: 58px;
+}
+
+.cv-template-ats .cv-main,
+.cv-template-compact .cv-main,
+.cv-template-academic .cv-main,
+.cv-template-executive .cv-main,
+.cv-template-portfolio .cv-main,
+.cv-template-timeline .cv-main,
+.cv-template-skills .cv-main {
+    max-width: var(--template-page-width);
+    gap: var(--template-main-gap);
+}
+
+.cv-template-ats .cv-header,
+.cv-template-compact .cv-header,
+.cv-template-academic .cv-header,
+.cv-template-executive .cv-header,
+.cv-template-portfolio .cv-header,
+.cv-template-timeline .cv-header,
+.cv-template-skills .cv-header {
+    width: 100%;
+    max-width: var(--template-page-width);
+    height: auto;
+    min-height: 0;
+}
+
+.cv-template-ats .cv-header-photo,
+.cv-template-compact .cv-header-photo,
+.cv-template-academic .cv-header-photo,
+.cv-template-executive .cv-header-photo,
+.cv-template-portfolio .cv-header-photo,
+.cv-template-timeline .cv-header-photo,
+.cv-template-skills .cv-header-photo {
+    display: none;
+}
+
+.cv-template-ats .cv-header-text,
+.cv-template-compact .cv-header-text,
+.cv-template-academic .cv-header-text,
+.cv-template-executive .cv-header-text,
+.cv-template-portfolio .cv-header-text,
+.cv-template-timeline .cv-header-text,
+.cv-template-skills .cv-header-text,
+.cv-template-ats .cv-header-tag,
+.cv-template-compact .cv-header-tag,
+.cv-template-academic .cv-header-tag,
+.cv-template-executive .cv-header-tag,
+.cv-template-portfolio .cv-header-tag,
+.cv-template-timeline .cv-header-tag,
+.cv-template-skills .cv-header-tag {
+    position: static;
+}
+
+.cv-template-ats .cv-header,
+.cv-template-compact .cv-header,
+.cv-template-academic .cv-header,
+.cv-template-executive .cv-header,
+.cv-template-timeline .cv-header,
+.cv-template-skills .cv-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.cv-template-ats .cv-header-name,
+.cv-template-compact .cv-header-name,
+.cv-template-academic .cv-header-name,
+.cv-template-executive .cv-header-name,
+.cv-template-portfolio .cv-header-name,
+.cv-template-timeline .cv-header-name,
+.cv-template-skills .cv-header-name {
+    padding-top: 0;
+    font-size: var(--template-name-size);
+    font-weight: var(--template-name-weight);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+}
+
+.cv-template-ats .cv-header-subtitle,
+.cv-template-compact .cv-header-subtitle,
+.cv-template-academic .cv-header-subtitle,
+.cv-template-executive .cv-header-subtitle,
+.cv-template-portfolio .cv-header-subtitle,
+.cv-template-timeline .cv-header-subtitle,
+.cv-template-skills .cv-header-subtitle,
+.cv-template-ats .cv-about-text,
+.cv-template-compact .cv-about-text,
+.cv-template-academic .cv-about-text,
+.cv-template-executive .cv-about-text,
+.cv-template-portfolio .cv-about-text,
+.cv-template-timeline .cv-about-text,
+.cv-template-skills .cv-about-text,
+.cv-template-ats .cv-date-column,
+.cv-template-compact .cv-date-column,
+.cv-template-academic .cv-date-column,
+.cv-template-executive .cv-date-column,
+.cv-template-portfolio .cv-date-column,
+.cv-template-timeline .cv-date-column,
+.cv-template-skills .cv-date-column,
+.cv-template-ats .cv-item-title,
+.cv-template-compact .cv-item-title,
+.cv-template-academic .cv-item-title,
+.cv-template-executive .cv-item-title,
+.cv-template-portfolio .cv-item-title,
+.cv-template-timeline .cv-item-title,
+.cv-template-skills .cv-item-title,
+.cv-template-ats .cv-item-subtitle,
+.cv-template-compact .cv-item-subtitle,
+.cv-template-academic .cv-item-subtitle,
+.cv-template-executive .cv-item-subtitle,
+.cv-template-portfolio .cv-item-subtitle,
+.cv-template-timeline .cv-item-subtitle,
+.cv-template-skills .cv-item-subtitle,
+.cv-template-ats .cv-item-link,
+.cv-template-compact .cv-item-link,
+.cv-template-academic .cv-item-link,
+.cv-template-executive .cv-item-link,
+.cv-template-portfolio .cv-item-link,
+.cv-template-timeline .cv-item-link,
+.cv-template-skills .cv-item-link {
+    font-size: var(--template-body-size);
+    line-height: var(--template-body-line);
+}
+
+.cv-template-ats .cv-section-title,
+.cv-template-compact .cv-section-title,
+.cv-template-academic .cv-section-title,
+.cv-template-executive .cv-section-title,
+.cv-template-portfolio .cv-section-title,
+.cv-template-timeline .cv-section-title,
+.cv-template-skills .cv-section-title {
+    font-size: var(--template-heading-size);
+    font-weight: var(--template-heading-weight);
+    line-height: 1.2;
+}
+
+.cv-template-ats .cv-section-items,
+.cv-template-compact .cv-section-items,
+.cv-template-academic .cv-section-items,
+.cv-template-executive .cv-section-items,
+.cv-template-portfolio .cv-section-items,
+.cv-template-timeline .cv-section-items,
+.cv-template-skills .cv-section-items {
+    gap: var(--template-item-gap);
+    margin-top: var(--template-section-gap);
+}
+
+.cv-template-ats .cv-date-column,
+.cv-template-compact .cv-date-column,
+.cv-template-academic .cv-date-column,
+.cv-template-executive .cv-date-column,
+.cv-template-portfolio .cv-date-column,
+.cv-template-timeline .cv-date-column,
+.cv-template-skills .cv-date-column {
+    width: var(--template-date-width);
+    font-variant-numeric: tabular-nums;
+}
+
+.cv-template-ats {
+    --template-page-width: 720px;
+    --template-page-gap: 24px;
+    --template-main-gap: 20px;
+    --template-section-gap: 7px;
+    --template-item-gap: 10px;
+    --template-date-width: 118px;
+    --template-body-size: 13px;
+    --template-body-line: 1.5;
+    --template-name-size: 26px;
+}
+
+.cv-template-ats .cv-header,
+.cv-template-ats .cv-section {
+    border-color: #d8d8d8;
+}
+
+.cv-template-compact {
+    --template-page-width: 700px;
+    --template-page-gap: 18px;
+    --template-main-gap: 15px;
+    --template-section-gap: 4px;
+    --template-item-gap: 7px;
+    --template-date-width: 96px;
+    --template-body-size: 12px;
+    --template-body-line: 1.35;
+    --template-heading-size: 12px;
+    --template-name-size: 24px;
+    padding-top: 42px;
+}
+
+.cv-template-compact .cv-header {
+    gap: 5px;
+    padding-bottom: 9px;
+}
+
+.cv-template-compact .cv-date-column {
+    font-style: italic;
+}
+
+.cv-template-compact .cv-item-images,
+.cv-template-compact .cv-writing-card {
+    display: none;
+}
+
+.cv-template-academic {
+    --template-page-width: 760px;
+    --template-page-gap: 22px;
+    --template-main-gap: 21px;
+    --template-section-gap: 9px;
+    --template-item-gap: 12px;
+    --template-date-width: 86px;
+    --template-body-size: 13px;
+    --template-body-line: 1.55;
+    --template-name-size: 24px;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.cv-template-academic .cv-header-name,
+.cv-template-academic .cv-header-subtitle,
+.cv-template-academic .cv-section-title,
+.cv-template-academic .cv-about-text,
+.cv-template-academic .cv-date-column,
+.cv-template-academic .cv-item-title,
+.cv-template-academic .cv-item-subtitle,
+.cv-template-academic .cv-item-link {
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.cv-template-executive {
+    --template-page-width: 760px;
+    --template-page-gap: 30px;
+    --template-main-gap: 26px;
+    --template-section-gap: 10px;
+    --template-item-gap: 13px;
+    --template-date-width: 122px;
+    --template-body-size: 13.5px;
+    --template-body-line: 1.55;
+    --template-name-size: 32px;
+}
+
+.cv-template-executive .cv-header {
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.06);
+}
+
+.cv-template-executive .cv-section-title {
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+}
+
+.cv-template-portfolio {
+    --template-page-width: 820px;
+    --template-page-gap: 32px;
+    --template-main-gap: 28px;
+    --template-section-gap: 10px;
+    --template-item-gap: 16px;
+    --template-date-width: 116px;
+    --template-body-size: 13px;
+    --template-body-line: 1.6;
+    --template-name-size: 34px;
+}
+
+.cv-template-portfolio .cv-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    min-height: 120px;
+    gap: 20px;
+    padding: 22px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--color-tag-bg), transparent 70%);
+}
+
+.cv-template-portfolio .cv-header-photo {
+    position: static;
+    display: block;
+    width: 96px;
+    height: 96px;
+}
+
+.cv-template-portfolio .cv-header-text {
+    position: static;
+}
+
+.cv-template-portfolio .cv-header-tag {
+    grid-column: 2;
+    justify-self: start;
+}
+
+.cv-template-portfolio .cv-section-title {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--color-tag-bg);
+}
+
+.cv-template-timeline {
+    --template-page-width: 760px;
+    --template-page-gap: 26px;
+    --template-main-gap: 22px;
+    --template-section-gap: 10px;
+    --template-item-gap: 15px;
+    --template-date-width: 96px;
+    --template-body-size: 13px;
+    --template-body-line: 1.55;
+    --template-name-size: 28px;
+}
+
+.cv-template-timeline .cv-item-row {
+    position: relative;
+}
+
+.cv-template-timeline .cv-date-column {
+    color: var(--color-text-primary);
+}
+
+.cv-template-timeline .cv-content-column {
+    padding-left: 18px;
+    border-left: 1px solid var(--color-border);
+}
+
+.cv-template-timeline .cv-content-column::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--template-date-width) - 4px);
+    top: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-bg);
+}
+
+.cv-template-skills {
+    --template-page-width: 760px;
+    --template-page-gap: 24px;
+    --template-main-gap: 20px;
+    --template-section-gap: 8px;
+    --template-item-gap: 10px;
+    --template-date-width: 104px;
+    --template-body-size: 13px;
+    --template-body-line: 1.5;
+    --template-name-size: 28px;
+}
+
+.cv-template-skills .cv-section:nth-of-type(1),
+.cv-template-skills .cv-section:nth-of-type(4),
+.cv-template-skills .cv-section:nth-of-type(5) {
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--color-tag-bg);
+}
+
 @media (min-width: 730px) {
     .cv-header {
         width: 600px;
     }
 
-    .cv-item-images {
+    .cv-template-readcv .cv-item-images {
         margin-left: -130px;
         width: calc(100% + 130px);
     }
@@ -439,6 +808,44 @@ body {
         max-width: none;
         padding: 0;
         margin: 15mm 20mm;
+    }
+
+    .cv-template-ats,
+    .cv-template-compact,
+    .cv-template-academic,
+    .cv-template-executive,
+    .cv-template-portfolio,
+    .cv-template-timeline,
+    .cv-template-skills {
+        max-width: none;
+        margin: 12mm 16mm;
+        gap: var(--template-page-gap);
+    }
+
+    .cv-template-compact {
+        margin: 9mm 14mm;
+    }
+
+    .cv-template-portfolio .cv-header,
+    .cv-template-executive .cv-header,
+    .cv-template-skills .cv-section:nth-of-type(1),
+    .cv-template-skills .cv-section:nth-of-type(4),
+    .cv-template-skills .cv-section:nth-of-type(5) {
+        box-shadow: none;
+        background: #fff;
+    }
+
+    .cv-template-portfolio .cv-header-photo {
+        display: none;
+    }
+
+    .cv-template-portfolio .cv-header {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .cv-template-portfolio .cv-header-tag {
+        grid-column: auto;
     }
 
     .cv-toolbar {
