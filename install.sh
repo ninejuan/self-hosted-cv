@@ -65,7 +65,24 @@ setup_env() {
     local env_file="$INSTALL_DIR/.env"
 
     if [ -f "$env_file" ]; then
-        warn ".env already exists — skipping generation. Review it manually if needed."
+        if ! grep -q '^TOTP_ENCRYPTION_KEY=.' "$env_file"; then
+            local totp_encryption_key
+            totp_encryption_key="$(rand_secret)"
+
+            if grep -q '^TOTP_ENCRYPTION_KEY=' "$env_file"; then
+                awk -v key="$totp_encryption_key" '
+                    /^TOTP_ENCRYPTION_KEY=/ { print "TOTP_ENCRYPTION_KEY=" key; next }
+                    { print }
+                ' "$env_file" > "${env_file}.tmp"
+                mv "${env_file}.tmp" "$env_file"
+            else
+                printf '\nTOTP_ENCRYPTION_KEY=%s\n' "$totp_encryption_key" >> "$env_file"
+            fi
+
+            ok "Added TOTP encryption key to existing .env"
+        else
+            warn ".env already exists — preserving current secrets."
+        fi
         return
     fi
 
@@ -75,6 +92,8 @@ setup_env() {
     admin_pass="$(rand_secret | tr -dc 'A-Za-z0-9' | head -c 20)"
     local session_secret
     session_secret="$(rand_secret)"
+    local totp_encryption_key
+    totp_encryption_key="$(rand_secret)"
     local pg_pass
     pg_pass="$(rand_secret | tr -dc 'A-Za-z0-9' | head -c 24)"
     local minio_secret
@@ -94,6 +113,7 @@ APP_VERSION=0.1.0
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=${admin_pass}
 SESSION_SECRET=${session_secret}
+TOTP_ENCRYPTION_KEY=${totp_encryption_key}
 SESSION_IDLE_TIMEOUT=1800
 SESSION_MAX_LIFETIME=86400
 LOGIN_MAX_ATTEMPTS=5

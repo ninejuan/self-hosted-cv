@@ -49,4 +49,5 @@ export enum AuditAction {
   LoginFailed = 'login_failed',
   TwoFactorSetup = '2fa_setup',
   TwoFactorVerify = '2fa_verify',
+  TwoFactorDisable = '2fa_disable',
 }

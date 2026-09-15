@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op, WhereOptions } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 
 import { AuditAction } from '@/database/enums';
 
@@ -24,17 +24,20 @@ export class AuditService {
     @InjectModel(AuditLog) private readonly auditLogModel: typeof AuditLog,
   ) {}
 
-  async record(input: AuditLogInput): Promise<void> {
-    await this.auditLogModel.create({
-      action: input.action,
-      entityType: input.entityType ?? null,
-      entityId: input.entityId ?? null,
-      oldValue: input.oldValue ?? null,
-      newValue: input.newValue ?? null,
-      ip: input.ip ?? null,
-      userAgent: input.userAgent ?? null,
-      sessionId: input.sessionId ?? null,
-    });
+  async record(input: AuditLogInput, transaction?: Transaction): Promise<void> {
+    await this.auditLogModel.create(
+      {
+        action: input.action,
+        entityType: input.entityType ?? null,
+        entityId: input.entityId ?? null,
+        oldValue: input.oldValue ?? null,
+        newValue: input.newValue ?? null,
+        ip: input.ip ?? null,
+        userAgent: input.userAgent ?? null,
+        sessionId: input.sessionId ?? null,
+      },
+      transaction ? { transaction } : undefined,
+    );
   }
 
   async query(dto: AuditLogQueryDto): Promise<{

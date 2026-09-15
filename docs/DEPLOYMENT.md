@@ -28,6 +28,7 @@ Edit `.env` — at minimum change these:
 ```
 ADMIN_PASSWORD=<strong-password>
 SESSION_SECRET=<random-64-char-string>
+TOTP_ENCRYPTION_KEY=<output-of-openssl-rand-base64-32>
 POSTGRES_PASSWORD=<random-password>
 MINIO_SECRET_KEY=<random-password>
 ```
@@ -139,6 +140,7 @@ docker compose -f docker/docker-compose.yml restart minio
 | `ADMIN_USERNAME` | `admin` | Admin login username |
 | `ADMIN_PASSWORD` | `changeme` | Admin login password |
 | `SESSION_SECRET` | — | Session encryption key (required) |
+| `TOTP_ENCRYPTION_KEY` | — | Base64-encoded 32-byte TOTP secret encryption key (required in production) |
 | `POSTGRES_PASSWORD` | `cv_password` | Database password |
 | `MINIO_SECRET_KEY` | `minioadmin123` | Object storage password |
 | `APP_URL` | `http://localhost` | Public URL for OG tags and links |

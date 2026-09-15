@@ -23,8 +23,10 @@ export class AuthController {
   }
 
   @Post('2fa/setup')
-  setupTwoFactor(): Promise<{ secret: string; qrCodeDataUrl: string }> {
-    return this.authService.setupTwoFactor();
+  setupTwoFactor(
+    @Req() request: Request,
+  ): Promise<{ secret: string; qrCodeDataUrl: string }> {
+    return this.authService.setupTwoFactor(request);
   }
 
   @Post('2fa/verify')
