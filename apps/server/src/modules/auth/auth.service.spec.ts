@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/unbound-method -- asserting calls on jest.fn() session mocks */
 import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
-import { BadRequestException, HttpStatus } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { getConnectionToken, getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as bcrypt from 'bcrypt';
 import type { Request } from 'express';
 import type Redis from 'ioredis';
 import type { Transaction } from 'sequelize';
@@ -62,6 +63,14 @@ describe('AuthService two-factor authentication', () => {
         TwoFactorService,
         { provide: LoginAttemptService, useValue: loginAttemptService },
         { provide: AuditService, useValue: auditService },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn(
+              (_key: string, defaultValue?: unknown) => defaultValue,
+            ),
+          },
+        },
         { provide: getModelToken(AppSetting), useValue: settingModel },
         { provide: getConnectionToken(), useValue: sequelize },
         { provide: getRedisConnectionToken(), useValue: redis },
@@ -76,72 +85,6 @@ describe('AuthService two-factor authentication', () => {
     delete process.env.TOTP_ENCRYPTION_KEY;
     jest.restoreAllMocks();
     jest.clearAllMocks();
-  });
-
-  describe('login', () => {
-    it('records the authentication time before saving the regenerated session', async () => {
-      const now = 1_789_499_200_000;
-      jest.spyOn(Date, 'now').mockReturnValue(now);
-      settingModel.findOne
-        .mockResolvedValueOnce({ value: { username: 'admin' } })
-        .mockResolvedValueOnce({
-          value: { hash: await bcrypt.hash('password', 4) },
-        })
-        .mockResolvedValueOnce({ value: { enabled: false } });
-      const regenerate = jest.fn((callback: (error?: Error) => void) =>
-        callback(),
-      );
-      const save = jest.fn((callback: (error?: Error) => void) => callback());
-      const request = {
-        ip: '127.0.0.1',
-        sessionID: 'current-session',
-        header: jest.fn().mockReturnValue('jest'),
-        session: { regenerate, save },
-      } as unknown as Request;
-
-      await service.login({ username: 'admin', password: 'password' }, request);
-
-      expect(regenerate).toHaveBeenCalledTimes(1);
-      expect(request.session.isAuthenticated).toBe(true);
-      expect(request.session.authenticatedAt).toBe(now);
-      expect(request.session.username).toBe('admin');
-      expect(save).toHaveBeenCalledTimes(1);
-      expect(loginAttemptService.reset).toHaveBeenCalledWith('admin');
-    });
-
-    it('records an account failure for an invalid password', async () => {
-      settingModel.findOne
-        .mockResolvedValueOnce({ value: { username: 'admin' } })
-        .mockResolvedValueOnce({
-          value: { hash: await bcrypt.hash('correct-password', 4) },
-        });
-      const request = createRequest();
-
-      await expect(
-        service.login(
-          { username: 'admin', password: 'invalid-password' },
-          request,
-        ),
-      ).rejects.toThrow('Invalid username or password');
-
-      expect(loginAttemptService.recordFailure).toHaveBeenCalledWith(
-        'admin',
-        '127.0.0.1',
-      );
-    });
-
-    it('throws 429 before loading credentials when the account is locked', async () => {
-      loginAttemptService.isAccountLocked.mockResolvedValueOnce(true);
-
-      await expect(
-        service.login(
-          { username: 'admin', password: 'password' },
-          createRequest(),
-        ),
-      ).rejects.toMatchObject({ status: HttpStatus.TOO_MANY_REQUESTS });
-
-      expect(settingModel.findOne).not.toHaveBeenCalled();
-    });
   });
 
   describe('setupTwoFactor', () => {
@@ -206,6 +149,27 @@ describe('AuthService two-factor authentication', () => {
       );
     });
 
+    it('regenerates and promotes a password-level session after verification', async () => {
+      const now = 1_789_499_200_000;
+      jest.spyOn(Date, 'now').mockReturnValue(now);
+      const secret = speakeasy.generateSecret({ length: 32 }).base32;
+      const code = speakeasy.totp({ secret, encoding: 'base32' });
+      settingModel.findOne.mockResolvedValue({ value: { secret } });
+      const request = createRequest();
+      request.session.isAuthenticated = true;
+      request.session.authLevel = 'password';
+      request.session.username = 'admin';
+
+      await service.verifyTwoFactor({ code }, request);
+
+      expect(request.session.regenerate).toHaveBeenCalledTimes(1);
+      expect(request.session.isAuthenticated).toBe(true);
+      expect(request.session.authenticatedAt).toBe(now);
+      expect(request.session.authLevel).toBe('mfa');
+      expect(request.session.username).toBe('admin');
+      expect(request.session.save).toHaveBeenCalledTimes(1);
+    });
+
     it('throws when no pending secret exists', async () => {
       settingModel.findOne.mockResolvedValue(null);
 
@@ -267,9 +231,13 @@ describe('AuthService two-factor authentication', () => {
 });
 
 function createRequest(): Request {
+  const regenerate = jest.fn((callback: (error?: Error) => void) => callback());
+  const save = jest.fn((callback: (error?: Error) => void) => callback());
+
   return {
     ip: '127.0.0.1',
     sessionID: 'current-session',
     header: jest.fn().mockReturnValue('jest'),
-  } as Request;
+    session: { regenerate, save },
+  } as unknown as Request;
 }

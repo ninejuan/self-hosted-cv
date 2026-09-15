@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,6 +10,13 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+
+// Password-level sessions may only enroll in MFA or end the session.
+const PASSWORD_LEVEL_ALLOWED_ROUTES = new Set([
+  'POST /api/auth/2fa/setup',
+  'POST /api/auth/2fa/verify',
+  'POST /api/auth/logout',
+]);
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -38,6 +46,22 @@ export class AuthGuard implements CanActivate {
       ) {
         request.session.destroy(() => undefined);
         throw new UnauthorizedException('Authentication required');
+      }
+
+      const requiresTwoFactor = this.configService.get<boolean>(
+        'REQUIRE_2FA',
+        false,
+      );
+      const isEnrollmentRoute = PASSWORD_LEVEL_ALLOWED_ROUTES.has(
+        `${request.method} ${request.path}`,
+      );
+
+      if (
+        requiresTwoFactor &&
+        request.session.authLevel !== 'mfa' &&
+        !isEnrollmentRoute
+      ) {
+        throw new ForbiddenException('Multi-factor authentication required');
       }
 
       return true;

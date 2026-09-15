@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { Reflector } from '@nestjs/core';
@@ -15,8 +15,10 @@ const SESSION_MAX_LIFETIME = 86400;
 describe('AuthGuard', () => {
   let guard: AuthGuard;
   let reflector: { getAllAndOverride: jest.Mock };
+  let requireTwoFactor: boolean;
 
   beforeEach(async () => {
+    requireTwoFactor = false;
     reflector = { getAllAndOverride: jest.fn() };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -24,7 +26,19 @@ describe('AuthGuard', () => {
         { provide: Reflector, useValue: reflector },
         {
           provide: ConfigService,
-          useValue: new ConfigService({ SESSION_MAX_LIFETIME }),
+          useValue: {
+            get: jest.fn((key: string, defaultValue?: unknown) => {
+              if (key === 'SESSION_MAX_LIFETIME') {
+                return SESSION_MAX_LIFETIME;
+              }
+
+              if (key === 'REQUIRE_2FA') {
+                return requireTwoFactor;
+              }
+
+              return defaultValue;
+            }),
+          },
         },
       ],
     }).compile();
@@ -80,6 +94,95 @@ describe('AuthGuard', () => {
           originalUrl: '/api/admin/profile',
           url: '/api/admin/profile',
           session: { isAuthenticated: true, authenticatedAt: Date.now() },
+        },
+      ],
+      TestController,
+      testHandler,
+    );
+
+    expect(guard.canActivate(context)).toBe(true);
+  });
+
+  it('denies a password-level session on a non-allowlisted route when 2FA is required', () => {
+    requireTwoFactor = true;
+    reflector.getAllAndOverride.mockReturnValue(false);
+    const context = new ExecutionContextHost(
+      [
+        {
+          method: 'GET',
+          path: '/api/admin/profile',
+          session: {
+            isAuthenticated: true,
+            authenticatedAt: Date.now(),
+            authLevel: 'password',
+          },
+        },
+      ],
+      TestController,
+      testHandler,
+    );
+
+    expect(() => guard.canActivate(context)).toThrow(
+      new ForbiddenException('Multi-factor authentication required'),
+    );
+  });
+
+  it('allows a password-level session to verify 2FA when 2FA is required', () => {
+    requireTwoFactor = true;
+    reflector.getAllAndOverride.mockReturnValue(false);
+    const context = new ExecutionContextHost(
+      [
+        {
+          method: 'POST',
+          path: '/api/auth/2fa/verify',
+          session: {
+            isAuthenticated: true,
+            authenticatedAt: Date.now(),
+            authLevel: 'password',
+          },
+        },
+      ],
+      TestController,
+      testHandler,
+    );
+
+    expect(guard.canActivate(context)).toBe(true);
+  });
+
+  it('allows an MFA-level session on an admin route when 2FA is required', () => {
+    requireTwoFactor = true;
+    reflector.getAllAndOverride.mockReturnValue(false);
+    const context = new ExecutionContextHost(
+      [
+        {
+          method: 'GET',
+          path: '/api/admin/profile',
+          session: {
+            isAuthenticated: true,
+            authenticatedAt: Date.now(),
+            authLevel: 'mfa',
+          },
+        },
+      ],
+      TestController,
+      testHandler,
+    );
+
+    expect(guard.canActivate(context)).toBe(true);
+  });
+
+  it('allows an authenticated session regardless of auth level when 2FA is not required', () => {
+    reflector.getAllAndOverride.mockReturnValue(false);
+    const context = new ExecutionContextHost(
+      [
+        {
+          method: 'GET',
+          path: '/api/admin/profile',
+          session: {
+            isAuthenticated: true,
+            authenticatedAt: Date.now(),
+            authLevel: 'password',
+          },
         },
       ],
       TestController,

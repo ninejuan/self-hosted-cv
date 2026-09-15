@@ -129,6 +129,11 @@ class EnvironmentVariables {
   })
   TOTP_ENCRYPTION_KEY?: string;
 
+  @Transform(({ value }) => value === 'true')
+  @IsBoolean()
+  @IsOptional()
+  REQUIRE_2FA = false;
+
   @Transform(({ value }) => Number(value))
   @IsInt()
   @Min(1)

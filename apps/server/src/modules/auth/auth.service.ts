@@ -4,6 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly auditService: AuditService,
     private readonly twoFactorService: TwoFactorService,
     private readonly loginAttemptService: LoginAttemptService,
+    private readonly configService: ConfigService,
     @InjectModel(AppSetting) private readonly settingModel: typeof AppSetting,
   ) {}
 
@@ -68,7 +70,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    if (await this.twoFactorService.isEnabled()) {
+    const isTwoFactorEnabled = await this.twoFactorService.isEnabled();
+
+    if (isTwoFactorEnabled) {
       if (
         !dto.totpCode ||
         !(await this.twoFactorService.verifyLoginToken(dto.totpCode))
@@ -94,6 +98,11 @@ export class AuthService {
     await this.regenerateSession(request);
     request.session.isAuthenticated = true;
     request.session.authenticatedAt = Date.now();
+    request.session.authLevel =
+      this.configService.get<boolean>('REQUIRE_2FA', false) &&
+      !isTwoFactorEnabled
+        ? 'password'
+        : 'mfa';
     request.session.username = adminUsername;
     await this.saveSession(request);
     await this.loginAttemptService.reset(dto.username);
@@ -120,7 +129,17 @@ export class AuthService {
     dto: TotpCodeDto,
     request: Request,
   ): Promise<{ enabled: true }> {
-    return this.twoFactorService.verify(dto, request);
+    const result = await this.twoFactorService.verify(dto, request);
+    const username = request.session.username;
+
+    await this.regenerateSession(request);
+    request.session.isAuthenticated = true;
+    request.session.authenticatedAt = Date.now();
+    request.session.authLevel = 'mfa';
+    request.session.username = username;
+    await this.saveSession(request);
+
+    return result;
   }
 
   async disableTwoFactor(
