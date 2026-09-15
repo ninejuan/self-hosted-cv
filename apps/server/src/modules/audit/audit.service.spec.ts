@@ -78,6 +78,24 @@ describe('AuditService', () => {
       }
     });
 
+    it('handles circular references in newValue without throwing', async () => {
+      const circular: Record<string, unknown> = { name: 'profile' };
+      circular['self'] = circular;
+
+      await expect(
+        service.record({ action: AuditAction.Update, newValue: circular }),
+      ).resolves.toBeUndefined();
+
+      const createdLog = getCreatedLog(auditLogModel);
+      const newValue = createdLog['newValue'];
+
+      expect(isRecord(newValue)).toBe(true);
+      if (isRecord(newValue)) {
+        expect(newValue['name']).toBe('profile');
+        expect(newValue['self']).toBe('[Circular]');
+      }
+    });
+
     it('passes through null fields unchanged', async () => {
       await service.record({
         action: AuditAction.Update,

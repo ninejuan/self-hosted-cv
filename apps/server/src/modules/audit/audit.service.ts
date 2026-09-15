@@ -67,44 +67,57 @@ export class AuditService {
       return value;
     }
 
-    return this.sanitizeRecord(value, 0);
+    const seen = new WeakSet<object>();
+    seen.add(value);
+
+    return this.sanitizeRecord(value, 0, seen);
   }
 
   private sanitizeRecord(
     value: Record<string, unknown>,
     depth: number,
+    seen: WeakSet<object>,
   ): Record<string, unknown> {
     const sanitizedValue: Record<string, unknown> = {};
 
     for (const [key, item] of Object.entries(value)) {
-      sanitizedValue[key] = this.sanitizeNestedValue(item, depth);
+      sanitizedValue[key] = this.sanitizeNestedValue(item, depth, seen);
     }
 
     return sanitizedValue;
   }
 
-  private sanitizeNestedValue(value: unknown, depth: number): unknown {
+  private sanitizeNestedValue(
+    value: unknown,
+    depth: number,
+    seen: WeakSet<object>,
+  ): unknown {
     if (typeof value === 'string') {
       return this.sanitizeString(value);
     }
 
-    if (depth >= MAX_AUDIT_VALUE_DEPTH) {
+    if (value === null || typeof value !== 'object') {
       return value;
     }
 
+    // Break cycles (e.g. Sequelize instances with parent back-refs) before JSONB serialization.
+    if (seen.has(value)) {
+      return '[Circular]';
+    }
+
+    if (depth >= MAX_AUDIT_VALUE_DEPTH) {
+      return '[Truncated]';
+    }
+
+    seen.add(value);
+
     if (Array.isArray(value)) {
-      return value.map((item) => this.sanitizeNestedValue(item, depth + 1));
+      return value.map((item) =>
+        this.sanitizeNestedValue(item, depth + 1, seen),
+      );
     }
 
-    if (this.isRecord(value)) {
-      return this.sanitizeRecord(value, depth + 1);
-    }
-
-    return value;
-  }
-
-  private isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
+    return this.sanitizeRecord(value as Record<string, unknown>, depth + 1, seen);
   }
 
   private getMaxFieldLength(): number {
