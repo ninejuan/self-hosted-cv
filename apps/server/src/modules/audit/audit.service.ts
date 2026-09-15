@@ -117,7 +117,11 @@ export class AuditService {
       );
     }
 
-    return this.sanitizeRecord(value as Record<string, unknown>, depth + 1, seen);
+    return this.sanitizeRecord(
+      value as Record<string, unknown>,
+      depth + 1,
+      seen,
+    );
   }
 
   private getMaxFieldLength(): number {

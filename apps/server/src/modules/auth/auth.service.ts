@@ -61,7 +61,10 @@ export class AuthService {
         sessionId: request.sessionID ?? null,
         newValue: { username: dto.username },
       });
-      await this.loginAttemptService.recordFailure(dto.username, request.ip ?? 'unknown');
+      await this.loginAttemptService.recordFailure(
+        dto.username,
+        request.ip ?? 'unknown',
+      );
       throw new UnauthorizedException('Invalid username or password');
     }
 
@@ -78,7 +81,10 @@ export class AuthService {
           sessionId: request.sessionID ?? null,
           newValue: { username: dto.username, reason: 'invalid_totp' },
         });
-        await this.loginAttemptService.recordFailure(dto.username, request.ip ?? 'unknown');
+        await this.loginAttemptService.recordFailure(
+          dto.username,
+          request.ip ?? 'unknown',
+        );
         throw new UnauthorizedException(
           'Invalid two-factor authentication code',
         );

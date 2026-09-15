@@ -3,6 +3,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Request } from 'express';
 
 import { Public } from '@/common/decorators/public.decorator';
+import type { CsrfTokenRequest } from '@/common/security/csrf';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -61,7 +62,7 @@ export class AuthController {
 
   @Get('csrf-token')
   @Public()
-  csrfToken(@Req() request: Request): { csrfToken: string } {
-    return { csrfToken: request.csrfToken() };
+  csrfToken(@Req() request: CsrfTokenRequest): { csrfToken: string } {
+    return { csrfToken: request.generateCsrfToken() };
   }
 }

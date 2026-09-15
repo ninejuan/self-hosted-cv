@@ -12,12 +12,11 @@ import {
   type ThrottlerModuleOptions,
 } from '@nestjs/throttler';
 import cookieParser from 'cookie-parser';
-import csurf from 'csurf';
-import type { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import type { Server } from 'node:http';
 
 import { AppModule } from '@/app.module';
+import { applyCsrf } from '@/common/security/csrf';
 import { AdminBootstrapService } from '@/modules/auth/admin-bootstrap.service';
 import { MinioService } from '@/modules/minio/minio.service';
 
@@ -117,23 +116,9 @@ export async function createTestApp(
     }),
   );
   app.use(cookieParser());
-  const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
-  app.use((request: Request, response: Response, next: NextFunction) => {
-    const path = request.originalUrl ?? request.url;
-    const isLogin =
-      request.method === 'POST' && path.startsWith('/api/auth/login');
-    const isCsrfToken =
-      request.method === 'GET' && path.startsWith('/api/auth/csrf-token');
-    const isMutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(
-      request.method,
-    );
-
-    if ((isMutating && !isLogin) || isCsrfToken) {
-      csrfProtection(request, response, next);
-      return;
-    }
-
-    next();
+  applyCsrf(app, {
+    secret: process.env.SESSION_SECRET ?? 'test-session-secret',
+    secure: false,
   });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(

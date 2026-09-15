@@ -5,7 +5,6 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import csurf from 'csurf';
 import { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
@@ -14,6 +13,7 @@ import RedisStore from 'connect-redis';
 
 import { HttpExceptionFilter } from '@/common/filters/http-exception.filter';
 import { LoggingInterceptor } from '@/common/interceptors/logging.interceptor';
+import { applyCsrf } from '@/common/security/csrf';
 import { MigrationRunner } from '@/database/migration-runner';
 import { LoggerService } from '@/logger/logger.service';
 
@@ -84,23 +84,9 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
-  const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
-  app.use((request: Request, response: Response, next: NextFunction) => {
-    const path = request.originalUrl ?? request.url;
-    const isLogin =
-      request.method === 'POST' && path.startsWith('/api/auth/login');
-    const isCsrfToken =
-      request.method === 'GET' && path.startsWith('/api/auth/csrf-token');
-    const isMutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(
-      request.method,
-    );
-
-    if ((isMutating && !isLogin) || isCsrfToken) {
-      csrfProtection(request, response, next);
-      return;
-    }
-
-    next();
+  applyCsrf(app, {
+    secret: configService.getOrThrow<string>('SESSION_SECRET'),
+    secure: configService.get<string>('NODE_ENV') === 'production',
   });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(

@@ -49,6 +49,7 @@ export default function Login() {
                 throw new Error(data.message ?? "Invalid credentials");
             }
 
+            clearCsrfToken();
             navigate("/admin");
         } catch (err) {
             setError(err instanceof Error ? err.message : "Login failed");
