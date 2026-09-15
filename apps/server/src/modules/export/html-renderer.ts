@@ -300,9 +300,7 @@ function renderEducation(items: ExportEducation[]): string {
   return sectionLayout('Education', rows);
 }
 
-function renderContact(
-  links: ExportProfile['socialLinks'],
-): string {
+function renderContact(links: ExportProfile['socialLinks']): string {
   const rows = links.map((link) =>
     itemRow(capitalize(link.platform), externalLink(link.url, link.username)),
   );
@@ -354,13 +352,13 @@ function buildHead(options: RenderOptions): string {
     canonicalUrl
       ? `<link rel="canonical" href="${escapeAttr(canonicalUrl)}" />`
       : '',
-    faviconHref
-      ? `<link rel="icon" href="${escapeAttr(faviconHref)}" />`
-      : '',
+    faviconHref ? `<link rel="icon" href="${escapeAttr(faviconHref)}" />` : '',
     `<meta property="og:type" content="profile" />`,
     `<meta property="og:title" content="${escapeAttr(ogTitle)}" />`,
     `<meta property="og:description" content="${escapeAttr(ogDescription)}" />`,
-    ogImage ? `<meta property="og:image" content="${escapeAttr(ogImage)}" />` : '',
+    ogImage
+      ? `<meta property="og:image" content="${escapeAttr(ogImage)}" />`
+      : '',
     canonicalUrl
       ? `<meta property="og:url" content="${escapeAttr(canonicalUrl)}" />`
       : '',

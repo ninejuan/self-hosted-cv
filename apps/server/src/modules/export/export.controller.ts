@@ -22,10 +22,7 @@ export class ExportController {
       .slice(0, 10)}.zip`;
 
     res.setHeader('Content-Type', 'application/zip');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${filename}"`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Length', zip.length);
     res.end(zip);
   }

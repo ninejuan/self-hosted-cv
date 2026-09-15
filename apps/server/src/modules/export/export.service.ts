@@ -5,11 +5,7 @@ import { CvService } from '@/modules/cv/cv.service';
 import { MinioService } from '@/modules/minio/minio.service';
 import { SettingsService } from '@/modules/settings/settings.service';
 
-import type {
-  ExportCvData,
-  ExportImage,
-  ExportProfile,
-} from './html-renderer';
+import type { ExportCvData, ExportImage, ExportProfile } from './html-renderer';
 import { renderStaticSite } from './html-renderer';
 
 type JsonRecord = Record<string, unknown>;
