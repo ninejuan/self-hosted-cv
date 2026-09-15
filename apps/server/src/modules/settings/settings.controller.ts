@@ -2,6 +2,7 @@ import { Body, Controller, Get, Put } from '@nestjs/common';
 
 import { Public } from '@/common/decorators/public.decorator';
 
+import { UpdateSiteSettingsDto } from './dto/update-site-settings.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { AppSetting } from './entities/app-setting.entity';
 import { SettingsService, SiteSettings } from './settings.service';
@@ -27,9 +28,9 @@ export class SettingsController {
 
   @Put('site')
   updateSiteSettings(
-    @Body() data: Partial<SiteSettings>,
+    @Body() dto: UpdateSiteSettingsDto,
   ): Promise<SiteSettings> {
-    return this.settingsService.updateSiteSettings(data);
+    return this.settingsService.updateSiteSettings(dto);
   }
 }
 

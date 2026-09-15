@@ -48,11 +48,12 @@ async function bootstrap() {
           objectSrc: ["'none'"],
           scriptSrc: [
             "'self'",
+            'https://www.googletagmanager.com',
             (request) => `'nonce-${cspNonces.get(request) ?? ''}'`,
           ],
           styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: ["'self'", 'data:', 'blob:'],
-          connectSrc: ["'self'"],
+          connectSrc: ["'self'", 'https://www.google-analytics.com'],
           fontSrc: ["'self'", 'data:'],
           formAction: ["'self'"],
         },

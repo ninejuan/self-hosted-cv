@@ -379,7 +379,6 @@ function buildHead(options: RenderOptions): string {
           site.googleAnalyticsId,
         )}');</script>`
       : '',
-    site.customHeadScripts ?? '',
     `<script>${EXPORT_THEME_SCRIPT}</script>`,
   ];
 

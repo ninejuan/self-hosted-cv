@@ -130,7 +130,6 @@ function createSiteSettings(): Awaited<
     ogImageUrl: '',
     themeColor: '#A8E765',
     googleAnalyticsId: '',
-    customHeadScripts: '',
     customCss: '',
   };
 }

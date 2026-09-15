@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
+import { GOOGLE_ANALYTICS_ID_PATTERN } from './dto/update-site-settings.dto';
+import type { UpdateSiteSettingsDto } from './dto/update-site-settings.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { AppSetting } from './entities/app-setting.entity';
 
@@ -15,7 +17,6 @@ export interface SiteSettings {
   ogImageUrl: string;
   themeColor: string;
   googleAnalyticsId: string;
-  customHeadScripts: string;
   customCss: string;
 }
 
@@ -28,7 +29,6 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
   ogImageUrl: '',
   themeColor: '#A8E765',
   googleAnalyticsId: '',
-  customHeadScripts: '',
   customCss: '',
 };
 
@@ -59,13 +59,35 @@ export class SettingsService {
 
     if (!record?.value) return { ...DEFAULT_SITE_SETTINGS };
 
+    const stored = record.value;
+
     return {
-      ...DEFAULT_SITE_SETTINGS,
-      ...(record.value as Partial<SiteSettings>),
+      siteTitle: readStringSetting(stored, 'siteTitle'),
+      siteDescription: readStringSetting(stored, 'siteDescription'),
+      faviconUrl: readStringSetting(stored, 'faviconUrl'),
+      ogTitle: readStringSetting(stored, 'ogTitle'),
+      ogDescription: readStringSetting(stored, 'ogDescription'),
+      ogImageUrl: readStringSetting(stored, 'ogImageUrl'),
+      themeColor: readStringSetting(
+        stored,
+        'themeColor',
+        DEFAULT_SITE_SETTINGS.themeColor,
+      ),
+      googleAnalyticsId: readGoogleAnalyticsId(stored),
+      customCss: readStringSetting(stored, 'customCss'),
     };
   }
 
-  async updateSiteSettings(data: Partial<SiteSettings>): Promise<SiteSettings> {
+  async updateSiteSettings(data: UpdateSiteSettingsDto): Promise<SiteSettings> {
+    if (
+      data.googleAnalyticsId !== undefined &&
+      !GOOGLE_ANALYTICS_ID_PATTERN.test(data.googleAnalyticsId)
+    ) {
+      throw new BadRequestException(
+        'googleAnalyticsId must be empty or a valid GA measurement ID',
+      );
+    }
+
     const current = await this.getSiteSettings();
     const merged = { ...current, ...data };
 
@@ -76,4 +98,18 @@ export class SettingsService {
 
     return merged;
   }
+}
+
+function readStringSetting(
+  stored: Record<string, unknown>,
+  key: string,
+  fallback = '',
+): string {
+  const value = stored[key];
+  return typeof value === 'string' ? value : fallback;
+}
+
+function readGoogleAnalyticsId(stored: Record<string, unknown>): string {
+  const value = readStringSetting(stored, 'googleAnalyticsId');
+  return GOOGLE_ANALYTICS_ID_PATTERN.test(value) ? value : '';
 }

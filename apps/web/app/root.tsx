@@ -11,6 +11,8 @@ import type { Route } from "./+types/root";
 import { ErrorBoundaryView } from "@/components/error-boundary";
 import "./app.css";
 
+const GOOGLE_ANALYTICS_ID_PATTERN = /^G-[A-Z0-9]{4,20}$/;
+
 export async function loader() {
     const isServer = typeof window === "undefined";
     const baseUrl = isServer
@@ -38,7 +40,6 @@ interface SiteSettings {
     ogImageUrl?: string;
     themeColor?: string;
     googleAnalyticsId?: string;
-    customHeadScripts?: string;
     customCss?: string;
 }
 
@@ -65,18 +66,22 @@ function SiteHead() {
     const data = useRouteLoaderData("root") as { site?: SiteSettings } | undefined;
     const site = data?.site;
     if (!site) return null;
+    const googleAnalyticsId = site.googleAnalyticsId;
+    const analyticsEnabled =
+        googleAnalyticsId !== undefined &&
+        GOOGLE_ANALYTICS_ID_PATTERN.test(googleAnalyticsId);
 
     return (
         <>
             {site.faviconUrl && <link rel="icon" type="image/png" href={site.faviconUrl} />}
             {site.customCss && <style dangerouslySetInnerHTML={{ __html: site.customCss }} />}
-            {site.googleAnalyticsId && (
-                <>
-                    <script async src={`https://www.googletagmanager.com/gtag/js?id=${site.googleAnalyticsId}`} />
-                    <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${site.googleAnalyticsId}');` }} />
-                </>
+            {analyticsEnabled && (
+                <script
+                    async
+                    src="/google-analytics.js"
+                    data-measurement-id={googleAnalyticsId}
+                />
             )}
-            {site.customHeadScripts && <script dangerouslySetInnerHTML={{ __html: site.customHeadScripts }} />}
         </>
     );
 }

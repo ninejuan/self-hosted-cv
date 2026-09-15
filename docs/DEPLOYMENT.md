@@ -62,6 +62,16 @@ Internal:
 
 All services run in a single `cv-network` bridge. Only port 80 is exposed.
 
+## Site Scripts and Analytics
+
+Arbitrary custom head scripts are not supported. The public CV and admin API share an origin, so injected JavaScript could read browser-held CSRF data and call authenticated admin endpoints. Existing `customHeadScripts` values in the database are ignored and are removed the next time site settings are saved.
+
+Google Analytics is the only allowlisted script integration. In **Settings → Integrations**, enter a GA measurement ID matching `G-` followed by 4-20 uppercase letters or digits, or leave it empty to disable analytics. The application rejects other values.
+
+Analytics initialization does not use an inline script. The public document loads the fixed same-origin `/google-analytics.js` bootstrap, which validates the measurement ID again before loading `https://www.googletagmanager.com/gtag/js`. The NestJS CSP keeps its per-request nonce, does not allow `unsafe-inline` for scripts, and allowlists only `https://www.googletagmanager.com` in `script-src` and `https://www.google-analytics.com` in `connect-src` for analytics.
+
+In the default topology, NestJS serves `/api/*` while React Router serves HTML. A reverse proxy that adds CSP to HTML responses must apply the same Google origins and provide a matching nonce to React Router's inline framework and theme scripts. Do not add `unsafe-inline` to `script-src`. Static exports have no server-generated nonce; configure their hosting CSP with reviewed script hashes or another host-supported policy.
+
 ## TLS / HTTPS
 
 The default stack exposes HTTP on port 80. For production HTTPS, put a reverse proxy in front:

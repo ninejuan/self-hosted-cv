@@ -5,6 +5,8 @@ import { Loader2, Trash2, Shield, Info, Globe, Save, Download } from "lucide-rea
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { cn } from "@/lib/utils";
 
+const GOOGLE_ANALYTICS_ID_PATTERN = /^G-[A-Z0-9]{4,20}$/;
+
 interface SiteSettings {
     siteTitle: string;
     siteDescription: string;
@@ -14,7 +16,6 @@ interface SiteSettings {
     ogImageUrl: string;
     themeColor: string;
     googleAnalyticsId: string;
-    customHeadScripts: string;
     customCss: string;
 }
 
@@ -27,7 +28,6 @@ const EMPTY_SITE: SiteSettings = {
     ogImageUrl: "",
     themeColor: "#A8E765",
     googleAnalyticsId: "",
-    customHeadScripts: "",
     customCss: "",
 };
 
@@ -89,6 +89,9 @@ export default function SettingsPage() {
     const [savingSite, setSavingSite] = useState(false);
     const [loaded, setLoaded] = useState(false);
     const [exporting, setExporting] = useState(false);
+    const analyticsIdValid =
+        site.googleAnalyticsId === "" ||
+        GOOGLE_ANALYTICS_ID_PATTERN.test(site.googleAnalyticsId);
 
     useEffect(() => {
         adminFetch<{ version: string }>("/api/admin/settings")
@@ -189,10 +192,10 @@ export default function SettingsPage() {
                             </div>
                             <button
                                 type="submit"
-                                disabled={savingSite || !loaded}
+                                disabled={savingSite || !loaded || !analyticsIdValid}
                                 className={cn(
                                     "inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-accent)] px-3 py-1.5 text-[13px] font-medium text-[#052D0A] transition-opacity",
-                                    (savingSite || !loaded) && "opacity-60",
+                                    (savingSite || !loaded || !analyticsIdValid) && "opacity-60",
                                 )}
                             >
                                 {savingSite ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
@@ -233,15 +236,35 @@ export default function SettingsPage() {
 
                             <div className="mt-2 border-t border-[var(--color-border)] pt-4">
                                 <p className="mb-3 text-[12px] font-medium text-[var(--color-text-muted)]">Integrations</p>
-                                <Field label="Google Analytics ID" value={site.googleAnalyticsId} onChange={(v) => updateSite("googleAnalyticsId", v)} placeholder="G-XXXXXXXXXX" />
+                                <div className="flex flex-col gap-1">
+                                    <label htmlFor="google-analytics-id" className="text-[12px] font-medium text-[var(--color-text-muted)]">
+                                        Google Analytics ID
+                                    </label>
+                                    <input
+                                        id="google-analytics-id"
+                                        type="text"
+                                        value={site.googleAnalyticsId}
+                                        onChange={(event) => updateSite("googleAnalyticsId", event.target.value.toUpperCase())}
+                                        placeholder="G-XXXXXXXXXX"
+                                        pattern="G-[A-Z0-9]{4,20}"
+                                        aria-describedby="google-analytics-id-hint"
+                                        aria-invalid={!analyticsIdValid}
+                                        className="rounded-lg border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-[13px] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent)]"
+                                    />
+                                    <p id="google-analytics-id-hint" className="text-[11px] text-[var(--color-text-muted)]">
+                                        Optional. Use a GA measurement ID in the G- format (4-20 uppercase letters or digits after G-).
+                                    </p>
+                                    {!analyticsIdValid && (
+                                        <p className="text-[11px] text-red-600" role="alert">
+                                            Enter a valid G- measurement ID or leave this field empty.
+                                        </p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="mt-2 border-t border-[var(--color-border)] pt-4">
                                 <p className="mb-3 text-[12px] font-medium text-[var(--color-text-muted)]">Advanced</p>
-                                <div className="flex flex-col gap-4">
-                                    <Field label="Custom CSS" value={site.customCss} onChange={(v) => updateSite("customCss", v)} type="textarea" placeholder="body { ... }" />
-                                    <Field label="Custom Head Scripts" value={site.customHeadScripts} onChange={(v) => updateSite("customHeadScripts", v)} type="textarea" placeholder="<script>...</script>" />
-                                </div>
+                                <Field label="Custom CSS" value={site.customCss} onChange={(v) => updateSite("customCss", v)} type="textarea" placeholder="body { ... }" />
                             </div>
                         </div>
                     </section>

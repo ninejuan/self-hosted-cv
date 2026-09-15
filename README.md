@@ -22,7 +22,7 @@ Self-Hosted CV는 개발자, 창업자, 발표자, 크리에이터가 자신의 
 - LinkedIn import: LinkedIn 데이터 아카이브 ZIP 업로드, 미리보기, 선택 반영
 - 인증/보안: Redis 세션, CSRF 보호, Helmet, 로그인 throttling, 선택형 TOTP 2FA
 - 성능/운영: Public CV Redis 캐싱, 자동 마이그레이션, health check, structured logging
-- 사이트 설정: favicon, title, description, OG 이미지, analytics/custom script/css 관리
+- 사이트 설정: favicon, title, description, OG 이미지, GA 측정 ID 기반 analytics, custom CSS 관리
 - 프린트/PDF: 브라우저 인쇄를 통한 깔끔한 라이트 테마 CV 출력
 - CI/CD: GitHub Actions 기반 lint, test, build, audit, release workflow
 
@@ -113,6 +113,8 @@ yarn lint
 
 마이그레이션은 서버 부팅 시 자동 실행됩니다. 운영 업그레이드 전에는 release note와 `.env.example` 변경 사항을 확인하세요.
 
+보안을 위해 임의의 custom head script 기능은 제공하지 않습니다. 공개 CV와 어드민 API가 같은 origin을 사용하므로 삽입된 JavaScript가 CSRF 정보를 읽고 인증된 API를 호출할 수 있습니다. Analytics는 검증된 `G-` 형식의 Google Analytics 측정 ID만 지원합니다. 자세한 CSP 구성은 [배포 가이드](docs/DEPLOYMENT.md#site-scripts-and-analytics)를 참고하세요.
+
 ---
 
 ## English
@@ -127,7 +129,7 @@ Self-Hosted CV is a ReadCV-inspired portfolio platform for people who want to ow
 - LinkedIn import: upload a LinkedIn archive ZIP, preview detected records, and apply selected data
 - Auth/security: Redis sessions, CSRF protection, Helmet, login throttling, and optional TOTP 2FA
 - Operations: Redis caching for the public CV, automatic migrations, health checks, and structured logging
-- Site settings: favicon, title, description, OG image, analytics/custom script/css management
+- Site settings: favicon, title, description, OG image, GA measurement ID analytics, and custom CSS
 - Print/PDF: clean light-theme CV output through the browser print dialog
 - CI/CD: GitHub Actions workflows for linting, tests, builds, audits, and releases
 
@@ -217,6 +219,8 @@ See `.env.example` for the full list and defaults.
 5. Back up PostgreSQL and MinIO volumes regularly.
 
 Database migrations run automatically during server bootstrap. Before upgrading production, review release notes and changes in `.env.example`.
+
+Arbitrary custom head scripts are not supported. Because the public CV and admin API share an origin, injected JavaScript could read CSRF data and call authenticated API endpoints. Analytics accepts only a validated Google Analytics measurement ID in the `G-` format. See the [deployment guide](docs/DEPLOYMENT.md#site-scripts-and-analytics) for CSP details.
 
 ## License
 
