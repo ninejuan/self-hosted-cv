@@ -45,3 +45,4 @@ docker/data/
 *.jpeg
 *.jpg
 .playwright-mcp/
+.omo/
