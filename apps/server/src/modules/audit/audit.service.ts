@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 
@@ -6,6 +7,11 @@ import { AuditAction } from '@/database/enums';
 
 import { AuditLogQueryDto } from './dto/audit-log-query.dto';
 import { AuditLog } from './entities/audit-log.entity';
+
+// eslint-disable-next-line no-control-regex -- intentionally strips C0/C1 control chars from audit input
+const CONTROL_CHARACTERS = /[\u0000-\u001F\u007F-\u009F]/g;
+const DEFAULT_AUDIT_MAX_FIELD_LEN = 1024;
+const MAX_AUDIT_VALUE_DEPTH = 6;
 
 export interface AuditLogInput {
   action: AuditAction;
@@ -22,21 +28,89 @@ export interface AuditLogInput {
 export class AuditService {
   constructor(
     @InjectModel(AuditLog) private readonly auditLogModel: typeof AuditLog,
+    private readonly configService: ConfigService,
   ) {}
 
   async record(input: AuditLogInput, transaction?: Transaction): Promise<void> {
     await this.auditLogModel.create(
       {
         action: input.action,
-        entityType: input.entityType ?? null,
-        entityId: input.entityId ?? null,
-        oldValue: input.oldValue ?? null,
-        newValue: input.newValue ?? null,
-        ip: input.ip ?? null,
-        userAgent: input.userAgent ?? null,
+        entityType: this.sanitizeString(input.entityType) ?? null,
+        entityId: this.sanitizeString(input.entityId) ?? null,
+        oldValue: this.sanitizeValue(input.oldValue) ?? null,
+        newValue: this.sanitizeValue(input.newValue) ?? null,
+        ip: this.sanitizeString(input.ip) ?? null,
+        userAgent: this.sanitizeString(input.userAgent) ?? null,
         sessionId: input.sessionId ?? null,
       },
       transaction ? { transaction } : undefined,
+    );
+  }
+
+  private sanitizeString(
+    value: string | null | undefined,
+  ): string | null | undefined {
+    if (value === null || value === undefined) {
+      return value;
+    }
+
+    return value
+      .replace(CONTROL_CHARACTERS, '')
+      .trim()
+      .slice(0, this.getMaxFieldLength());
+  }
+
+  private sanitizeValue(
+    value: Record<string, unknown> | null | undefined,
+  ): Record<string, unknown> | null | undefined {
+    if (value === null || value === undefined) {
+      return value;
+    }
+
+    return this.sanitizeRecord(value, 0);
+  }
+
+  private sanitizeRecord(
+    value: Record<string, unknown>,
+    depth: number,
+  ): Record<string, unknown> {
+    const sanitizedValue: Record<string, unknown> = {};
+
+    for (const [key, item] of Object.entries(value)) {
+      sanitizedValue[key] = this.sanitizeNestedValue(item, depth);
+    }
+
+    return sanitizedValue;
+  }
+
+  private sanitizeNestedValue(value: unknown, depth: number): unknown {
+    if (typeof value === 'string') {
+      return this.sanitizeString(value);
+    }
+
+    if (depth >= MAX_AUDIT_VALUE_DEPTH) {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((item) => this.sanitizeNestedValue(item, depth + 1));
+    }
+
+    if (this.isRecord(value)) {
+      return this.sanitizeRecord(value, depth + 1);
+    }
+
+    return value;
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  private getMaxFieldLength(): number {
+    return (
+      this.configService.get<number>('AUDIT_MAX_FIELD_LEN') ??
+      DEFAULT_AUDIT_MAX_FIELD_LEN
     );
   }
 

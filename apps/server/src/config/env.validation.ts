@@ -149,6 +149,12 @@ class EnvironmentVariables {
   @Min(1)
   LOGIN_LOCKOUT_DURATION!: number;
 
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  AUDIT_MAX_FIELD_LEN = 1024;
+
   @IsString()
   @IsNotEmpty()
   MINIO_INTERNAL_ENDPOINT!: string;
