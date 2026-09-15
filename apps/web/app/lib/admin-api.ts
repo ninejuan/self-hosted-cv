@@ -4,6 +4,22 @@ const BASE_URL = typeof window !== "undefined"
 
 let csrfToken: string | null = null;
 
+export class AdminFetchError extends Error {
+    readonly name = "AdminFetchError";
+
+    constructor(
+        message: string,
+        readonly status: number,
+    ) {
+        super(message);
+    }
+}
+
+export type AdminBlobResponse = {
+    readonly blob: Blob;
+    readonly headers: Headers;
+};
+
 export async function getCsrfToken(): Promise<string> {
     if (csrfToken) return csrfToken;
     const res = await fetch(`${BASE_URL}/api/auth/csrf-token`, {
@@ -21,13 +37,22 @@ export function clearCsrfToken() {
 
 interface FetchOptions extends Omit<RequestInit, "body"> {
     body?: unknown;
+    responseType?: "blob" | "json";
 }
 
+export function adminFetch(
+    path: string,
+    options: FetchOptions & { responseType: "blob" },
+): Promise<AdminBlobResponse>;
+export function adminFetch<T = unknown>(
+    path: string,
+    options?: FetchOptions & { responseType?: "json" },
+): Promise<T>;
 export async function adminFetch<T = unknown>(
     path: string,
     options: FetchOptions = {},
-): Promise<T> {
-    const { body, headers: customHeaders, ...rest } = options;
+): Promise<AdminBlobResponse | T> {
+    const { body, headers: customHeaders, responseType = "json", ...rest } = options;
     const method = rest.method ?? "GET";
 
     const headers: Record<string, string> = {
@@ -57,15 +82,21 @@ export async function adminFetch<T = unknown>(
         if (typeof window !== "undefined") {
             window.location.href = "/login";
         }
-        throw new Error("Unauthorized");
+        throw new AdminFetchError("Unauthorized", res.status);
     }
 
     if (!res.ok) {
         const err = await res.json().catch(() => ({ message: res.statusText }));
-        throw new Error(err.message ?? `Request failed: ${res.status}`);
+        throw new AdminFetchError(
+            err.message ?? `Request failed: ${res.status}`,
+            res.status,
+        );
     }
 
     if (res.status === 204) return undefined as T;
+    if (responseType === "blob") {
+        return { blob: await res.blob(), headers: res.headers };
+    }
     return res.json();
 }
 

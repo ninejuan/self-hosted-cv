@@ -5,11 +5,12 @@ import { MinioModule } from '@/modules/minio/minio.module';
 import { SettingsModule } from '@/modules/settings/settings.module';
 
 import { ExportController } from './export.controller';
+import { ExportArchiveBuilderService } from './export-archive-builder.service';
 import { ExportService } from './export.service';
 
 @Module({
   imports: [CvModule, SettingsModule, MinioModule],
   controllers: [ExportController],
-  providers: [ExportService],
+  providers: [ExportArchiveBuilderService, ExportService],
 })
 export class ExportModule {}

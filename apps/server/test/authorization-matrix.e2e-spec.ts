@@ -27,7 +27,6 @@ const PUBLIC_GET_ROUTES = [
 
 const PROTECTED_GET_ROUTES = [
   ['get', '/api/admin/audit-logs'],
-  ['get', '/api/admin/export'],
   ['get', '/api/admin/update-check'],
   ['get', '/api/admin/profile'],
   ['get', '/api/admin/sections'],
@@ -43,6 +42,7 @@ const PROTECTED_GET_ROUTES = [
 ] as const satisfies readonly RouteExpectation[];
 
 const PROTECTED_MUTATION_ROUTES = [
+  ['post', '/api/admin/export'],
   ['post', '/api/auth/logout'],
   ['post', '/api/auth/2fa/setup'],
   ['post', '/api/auth/2fa/verify'],

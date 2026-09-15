@@ -1,14 +1,9 @@
 import { useState, useEffect } from "react";
-import { adminFetch } from "@/lib/admin-api";
+import { AdminFetchError, adminFetch } from "@/lib/admin-api";
 import { toast } from "sonner";
 import { Loader2, Trash2, Shield, Info, Globe, Save, Download } from "lucide-react";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { cn } from "@/lib/utils";
-
-const API_BASE_URL =
-    typeof window !== "undefined"
-        ? (import.meta.env.VITE_API_URL ?? "")
-        : "";
 
 interface SiteSettings {
     siteTitle: string;
@@ -120,21 +115,12 @@ export default function SettingsPage() {
     async function handleExport() {
         setExporting(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/api/admin/export`, {
+            const { blob, headers } = await adminFetch("/api/admin/export", {
+                method: "POST",
                 headers: { Accept: "application/zip" },
-                credentials: "include",
+                responseType: "blob",
             });
-
-            if (res.status === 401) {
-                window.location.href = "/login";
-                return;
-            }
-            if (!res.ok) {
-                throw new Error(`Export failed: ${res.status}`);
-            }
-
-            const blob = await res.blob();
-            const disposition = res.headers.get("Content-Disposition") ?? "";
+            const disposition = headers.get("Content-Disposition") ?? "";
             const match = disposition.match(/filename="?([^"]+)"?/);
             const filename = match?.[1] ?? "cv-static-site.zip";
 
@@ -149,7 +135,15 @@ export default function SettingsPage() {
 
             toast.success("Static site exported");
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Export failed");
+            if (err instanceof AdminFetchError && err.status === 409) {
+                toast.error("Export already running");
+            } else if (err instanceof AdminFetchError && err.status === 413) {
+                toast.error("Export too large");
+            } else if (err instanceof AdminFetchError && err.status === 429) {
+                toast.error("Too many requests");
+            } else {
+                toast.error(err instanceof Error ? err.message : "Export failed");
+            }
         } finally {
             setExporting(false);
         }

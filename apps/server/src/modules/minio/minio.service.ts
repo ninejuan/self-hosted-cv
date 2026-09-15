@@ -81,6 +81,11 @@ export class MinioService implements OnModuleInit {
     return Buffer.concat(chunks);
   }
 
+  async statObjectSize(objectKey: string): Promise<number> {
+    const stat = await this.internalClient.statObject(this.bucket, objectKey);
+    return stat.size;
+  }
+
   getBucket(): string {
     return this.bucket;
   }

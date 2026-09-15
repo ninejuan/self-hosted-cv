@@ -6,8 +6,10 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
+  ValidateIf,
   validateSync,
 } from 'class-validator';
 
@@ -32,6 +34,36 @@ class EnvironmentVariables {
   @IsString()
   @IsOptional()
   APP_URL?: string;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  EXPORT_LOCK_TTL_MS?: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  EXPORT_MAX_EXEC_MS?: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  EXPORT_MAX_OBJECTS?: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  EXPORT_MAX_OBJECT_BYTES?: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  EXPORT_MAX_TOTAL_BYTES?: number;
 
   @IsString()
   @IsNotEmpty()
@@ -85,6 +117,17 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   SESSION_SECRET!: string;
+
+  @ValidateIf(
+    (environment: EnvironmentVariables) =>
+      environment.NODE_ENV === NodeEnv.Production,
+  )
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^[A-Za-z0-9+/]{43}=$/, {
+    message: 'TOTP_ENCRYPTION_KEY must be a base64-encoded 32-byte key',
+  })
+  TOTP_ENCRYPTION_KEY?: string;
 
   @Transform(({ value }) => Number(value))
   @IsInt()
