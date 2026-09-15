@@ -2,6 +2,7 @@ import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
 import { BadRequestException } from '@nestjs/common';
 import { getConnectionToken, getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as bcrypt from 'bcrypt';
 import type { Request } from 'express';
 import type Redis from 'ioredis';
 import type { Transaction } from 'sequelize';
@@ -59,7 +60,39 @@ describe('AuthService two-factor authentication', () => {
 
   afterEach(() => {
     delete process.env.TOTP_ENCRYPTION_KEY;
+    jest.restoreAllMocks();
     jest.clearAllMocks();
+  });
+
+  describe('login', () => {
+    it('records the authentication time before saving the regenerated session', async () => {
+      const now = 1_789_499_200_000;
+      jest.spyOn(Date, 'now').mockReturnValue(now);
+      settingModel.findOne
+        .mockResolvedValueOnce({ value: { username: 'admin' } })
+        .mockResolvedValueOnce({
+          value: { hash: await bcrypt.hash('password', 4) },
+        })
+        .mockResolvedValueOnce({ value: { enabled: false } });
+      const regenerate = jest.fn((callback: (error?: Error) => void) =>
+        callback(),
+      );
+      const save = jest.fn((callback: (error?: Error) => void) => callback());
+      const request = {
+        ip: '127.0.0.1',
+        sessionID: 'current-session',
+        header: jest.fn().mockReturnValue('jest'),
+        session: { regenerate, save },
+      } as unknown as Request;
+
+      await service.login({ username: 'admin', password: 'password' }, request);
+
+      expect(regenerate).toHaveBeenCalledTimes(1);
+      expect(request.session.isAuthenticated).toBe(true);
+      expect(request.session.authenticatedAt).toBe(now);
+      expect(request.session.username).toBe('admin');
+      expect(save).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('setupTwoFactor', () => {

@@ -73,13 +73,13 @@ async function bootstrap() {
       store: new RedisStore({
         client: sessionRedis,
         prefix: 'cv:sess:',
-        ttl: Number(configService.get('SESSION_MAX_LIFETIME', 86400)),
+        ttl: Number(configService.get('SESSION_IDLE_TIMEOUT', 1800)),
       }),
       cookie: {
         httpOnly: true,
         secure: configService.get<string>('NODE_ENV') === 'production',
         sameSite: 'lax',
-        maxAge: Number(configService.get('SESSION_MAX_LIFETIME', 86400)) * 1000,
+        maxAge: Number(configService.get('SESSION_IDLE_TIMEOUT', 1800)) * 1000,
       },
     }),
   );

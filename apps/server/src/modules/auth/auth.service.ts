@@ -71,6 +71,7 @@ export class AuthService {
 
     await this.regenerateSession(request);
     request.session.isAuthenticated = true;
+    request.session.authenticatedAt = Date.now();
     request.session.username = adminUsername;
     await this.saveSession(request);
 

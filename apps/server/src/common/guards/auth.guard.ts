@@ -4,6 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
@@ -11,7 +12,10 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly configService: ConfigService,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -24,6 +28,18 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<Request>();
     if (request.session?.isAuthenticated === true) {
+      const authenticatedAt = request.session.authenticatedAt;
+      const absoluteLifetimeMs =
+        Number(this.configService.get('SESSION_MAX_LIFETIME', 86400)) * 1000;
+
+      if (
+        authenticatedAt === undefined ||
+        Date.now() - authenticatedAt >= absoluteLifetimeMs
+      ) {
+        request.session.destroy(() => undefined);
+        throw new UnauthorizedException('Authentication required');
+      }
+
       return true;
     }
 
