@@ -89,7 +89,10 @@ export const FALLBACK_CV_TEMPLATES = [
     },
 ] as const;
 
-export type CVTemplateKey = (typeof FALLBACK_CV_TEMPLATES)[number]["key"];
+export type BuiltInCVTemplateKey = (typeof FALLBACK_CV_TEMPLATES)[number]["key"];
+
+// Keys come from the runtime DB catalog, not only the built-in fallbacks.
+export type CVTemplateKey = string;
 
 export interface CVTemplateMetadata {
     id: string;
@@ -105,15 +108,13 @@ export interface CVTemplateMetadata {
 
 export const DEFAULT_CV_TEMPLATE: CVTemplateKey = "readcv";
 
-const FALLBACK_TEMPLATE_KEYS = new Set<string>(FALLBACK_CV_TEMPLATES.map((template) => template.key));
-
 export function parseCVTemplateKey(
     value: string | null | undefined,
     templates: readonly CVTemplateMetadata[] = FALLBACK_CV_TEMPLATES,
 ): CVTemplateKey {
     const availableKeys = new Set(templates.map((template) => template.key));
-    if (value && availableKeys.has(value) && FALLBACK_TEMPLATE_KEYS.has(value)) {
-        return value as CVTemplateKey;
+    if (value && availableKeys.has(value)) {
+        return value;
     }
 
     return DEFAULT_CV_TEMPLATE;

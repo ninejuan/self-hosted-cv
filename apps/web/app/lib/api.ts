@@ -1,7 +1,7 @@
 import type { CVData } from "@/types/cv";
 import {
+    DEFAULT_CV_TEMPLATE,
     FALLBACK_CV_TEMPLATES,
-    parseCVTemplateKey,
     type CVTemplateMetadata,
 } from "@/lib/cv-templates";
 
@@ -79,12 +79,11 @@ function normalizeCV(data: ServerCVResponse): CVData {
     const templateMeta = recordValue(profile.cvTemplate)
         ?? recordValue(profile.template)
         ?? recordValue(profile.cv_template);
-    const templateKey = parseCVTemplateKey(
-        optionalString(templateMeta?.key)
-            ?? optionalString(profile.cvTemplate)
-            ?? optionalString(profile.cvTemplateKey)
-            ?? optionalString(profile.templateKey),
-    );
+    const templateKey = optionalString(templateMeta?.key)
+        ?? optionalString(profile.cvTemplate)
+        ?? optionalString(profile.cvTemplateKey)
+        ?? optionalString(profile.templateKey)
+        ?? DEFAULT_CV_TEMPLATE;
 
     return {
         profile: {
