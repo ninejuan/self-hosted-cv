@@ -25,6 +25,7 @@ import { EducationModule } from '@/modules/education/education.module';
 import { Education } from '@/modules/education/entities/education.entity';
 import { ExperienceModule } from '@/modules/experience/experience.module';
 import { WorkExperience } from '@/modules/experience/entities/work-experience.entity';
+import { ExportModule } from '@/modules/export/export.module';
 import { HealthModule } from '@/modules/health/health.module';
 import { LinkedinModule } from '@/modules/linkedin/linkedin.module';
 import { Media } from '@/modules/media/entities/media.entity';
@@ -100,6 +101,7 @@ import { WritingModule } from '@/modules/writing/writing.module';
     SettingsModule,
     TemplateModule,
     LinkedinModule,
+    ExportModule,
   ],
   providers: [
     LoggerService,

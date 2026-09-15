@@ -32,5 +32,6 @@ import { CvService } from './cv.service';
   ],
   controllers: [CvController],
   providers: [CvService],
+  exports: [CvService],
 })
 export class CvModule {}

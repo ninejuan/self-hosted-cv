@@ -28,7 +28,7 @@ interface CvSectionResponse {
 type JsonRecord = Record<string, unknown>;
 type SerializableModel = { toJSON: () => unknown };
 
-interface CvResponse {
+export interface CvResponse {
   profile: Profile | JsonRecord;
   sections: CvSectionResponse[];
 }

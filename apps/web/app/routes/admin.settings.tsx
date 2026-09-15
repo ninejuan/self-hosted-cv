@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/admin-api";
 import { toast } from "sonner";
-import { Loader2, Trash2, Shield, Info, Globe, Save } from "lucide-react";
+import { Loader2, Trash2, Shield, Info, Globe, Save, Download } from "lucide-react";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { cn } from "@/lib/utils";
+
+const API_BASE_URL =
+    typeof window !== "undefined"
+        ? (import.meta.env.VITE_API_URL ?? "")
+        : "";
 
 interface SiteSettings {
     siteTitle: string;
@@ -88,6 +93,7 @@ export default function SettingsPage() {
     const [site, setSite] = useState<SiteSettings>(EMPTY_SITE);
     const [savingSite, setSavingSite] = useState(false);
     const [loaded, setLoaded] = useState(false);
+    const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
         adminFetch<{ version: string }>("/api/admin/settings")
@@ -108,6 +114,44 @@ export default function SettingsPage() {
             toast.error(err instanceof Error ? err.message : "Failed to clear cache");
         } finally {
             setClearing(false);
+        }
+    }
+
+    async function handleExport() {
+        setExporting(true);
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/export`, {
+                headers: { Accept: "application/zip" },
+                credentials: "include",
+            });
+
+            if (res.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+            if (!res.ok) {
+                throw new Error(`Export failed: ${res.status}`);
+            }
+
+            const blob = await res.blob();
+            const disposition = res.headers.get("Content-Disposition") ?? "";
+            const match = disposition.match(/filename="?([^"]+)"?/);
+            const filename = match?.[1] ?? "cv-static-site.zip";
+
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = filename;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            URL.revokeObjectURL(url);
+
+            toast.success("Static site exported");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Export failed");
+        } finally {
+            setExporting(false);
         }
     }
 
@@ -221,6 +265,30 @@ export default function SettingsPage() {
                             2FA setup will be available in a future update.
                         </p>
                     </div>
+                </section>
+
+                <section className="rounded-xl border border-[var(--color-border)] p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Download className="size-4 text-[var(--color-text-muted)]" />
+                        <h2 className="text-[14px] font-semibold text-[var(--color-text-primary)]">
+                            Export Static Site
+                        </h2>
+                    </div>
+                    <p className="mb-3 text-[13px] text-[var(--color-text-secondary)]">
+                        Download a self-contained static site (HTML, CSS, images, SEO tags, sitemap) you can deploy to Vercel, Netlify, or any static host — no backend required.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={handleExport}
+                        disabled={exporting}
+                        className={cn(
+                            "inline-flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-3 py-1.5 text-[13px] font-medium text-[#052D0A] transition-opacity",
+                            exporting && "opacity-60",
+                        )}
+                    >
+                        {exporting ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+                        {exporting ? "Exporting…" : "Export Static Site"}
+                    </button>
                 </section>
 
                 <section className="rounded-xl border border-[var(--color-border)] p-5">
