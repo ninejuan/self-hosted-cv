@@ -9,7 +9,7 @@
         "apps/*"
     ],
     "scripts": {
-        "postinstall": "git config core.hooksPath .githooks",
+        "postinstall": "git config core.hooksPath .githooks || true",
         "dev:server": "yarn workspace @ninejuan/cv-server start:dev",
         "dev:web": "yarn workspace @ninejuan/cv-web dev",
         "build:server": "yarn workspace @ninejuan/cv-server build",
