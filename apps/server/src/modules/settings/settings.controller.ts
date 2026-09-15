@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Put } from '@nestjs/common';
 
+import { Public } from '@/common/decorators/public.decorator';
+
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { AppSetting } from './entities/app-setting.entity';
 import { SettingsService, SiteSettings } from './settings.service';
@@ -31,6 +33,7 @@ export class SettingsController {
   }
 }
 
+@Public()
 @Controller('site-settings')
 export class PublicSiteSettingsController {
   constructor(private readonly settingsService: SettingsService) {}

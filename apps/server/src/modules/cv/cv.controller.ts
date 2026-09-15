@@ -1,8 +1,11 @@
 import { Controller, Get, HttpCode, HttpStatus, Res } from '@nestjs/common';
 import type { Response } from 'express';
 
+import { Public } from '@/common/decorators/public.decorator';
+
 import { CvService } from './cv.service';
 
+@Public()
 @Controller('cv')
 export class CvController {
   constructor(private readonly cvService: CvService) {}

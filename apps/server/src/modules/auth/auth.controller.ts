@@ -2,6 +2,8 @@ import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Request } from 'express';
 
+import { Public } from '@/common/decorators/public.decorator';
+
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { TotpCodeDto } from './dto/totp-code.dto';
@@ -11,6 +13,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @Public()
   @UseGuards(ThrottlerGuard)
   login(
     @Body() dto: LoginDto,
@@ -46,6 +49,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @Public()
   me(@Req() request: Request): {
     isAuthenticated: boolean;
     username: string | null;
@@ -54,6 +58,7 @@ export class AuthController {
   }
 
   @Get('csrf-token')
+  @Public()
   csrfToken(@Req() request: Request): { csrfToken: string } {
     return { csrfToken: request.csrfToken() };
   }

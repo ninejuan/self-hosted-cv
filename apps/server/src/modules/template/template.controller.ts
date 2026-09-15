@@ -1,8 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
 
+import { Public } from '@/common/decorators/public.decorator';
+
 import { CvTemplate } from './entities/cv-template.entity';
 import { TemplateService } from './template.service';
 
+@Public()
 @Controller('templates')
 export class PublicTemplateController {
   constructor(private readonly templateService: TemplateService) {}
