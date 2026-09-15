@@ -4,8 +4,13 @@ import {
   type InjectionToken,
 } from '@nestjs/common';
 import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
+import { ConfigService } from '@nestjs/config';
 import { getConnectionToken } from '@nestjs/sequelize';
 import { Test } from '@nestjs/testing';
+import {
+  getOptionsToken,
+  type ThrottlerModuleOptions,
+} from '@nestjs/throttler';
 import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
 import type { NextFunction, Request, Response } from 'express';
@@ -42,11 +47,27 @@ const redisStub = {
   ping: jest.fn().mockResolvedValue('PONG'),
   quit: jest.fn().mockResolvedValue('OK'),
   set: jest.fn().mockResolvedValue('OK'),
+  eval: jest.fn().mockResolvedValue(0),
+  call: jest.fn().mockResolvedValue([0, 0, 0, 0]),
+  disconnect: jest.fn(),
 };
 
 const moduleInitStub = {
   onModuleInit: jest.fn().mockResolvedValue(undefined),
 };
+
+// Omit the Redis storage adapter so the forRootAsync factory doesn't open a real
+// ioredis connection against the stub (NOAUTH); Nest uses in-memory storage in tests.
+const createTestThrottlerOptions = (
+  configService: ConfigService,
+): ThrottlerModuleOptions => ({
+  throttlers: [
+    {
+      ttl: configService.get<number>('LOGIN_LOCKOUT_DURATION', 900) * 1000,
+      limit: configService.get<number>('LOGIN_MAX_ATTEMPTS', 5),
+    },
+  ],
+});
 
 export async function createTestApp(
   options: CreateTestAppOptions = {},
@@ -59,6 +80,11 @@ export async function createTestApp(
       .useValue(databaseStub)
       .overrideProvider(getRedisConnectionToken())
       .useValue(redisStub)
+      .overrideProvider(getOptionsToken())
+      .useFactory({
+        factory: createTestThrottlerOptions,
+        inject: [ConfigService],
+      })
       .overrideProvider(AdminBootstrapService)
       .useValue(moduleInitStub)
       .overrideProvider(MinioService)

@@ -1,5 +1,5 @@
 import { getRedisConnectionToken } from '@nestjs-modules/ioredis';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, HttpStatus } from '@nestjs/common';
 import { getConnectionToken, getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
@@ -15,6 +15,7 @@ import { createMockModel, MockModel } from '@/test-utils/mock-model';
 
 import { AuthSessionService } from './auth-session.service';
 import { AuthService } from './auth.service';
+import { LoginAttemptService } from './login-attempt.service';
 import { decryptSecret } from './totp-crypto';
 import { TwoFactorService } from './two-factor.service';
 
@@ -25,6 +26,13 @@ describe('AuthService two-factor authentication', () => {
   let twoFactorService: TwoFactorService;
   let settingModel: MockModel<SettingRecord>;
   let auditService: { record: jest.MockedFunction<AuditService['record']> };
+  let loginAttemptService: {
+    isAccountLocked: jest.MockedFunction<
+      LoginAttemptService['isAccountLocked']
+    >;
+    recordFailure: jest.MockedFunction<LoginAttemptService['recordFailure']>;
+    reset: jest.MockedFunction<LoginAttemptService['reset']>;
+  };
   let redis: Pick<Redis, 'scan' | 'del'>;
   const transaction = { id: 'test-transaction' } as Transaction;
   const sequelize: Pick<Sequelize, 'transaction'> = {
@@ -37,6 +45,11 @@ describe('AuthService two-factor authentication', () => {
     process.env.TOTP_ENCRYPTION_KEY = Buffer.alloc(32, 7).toString('base64');
     settingModel = createMockModel<SettingRecord>();
     auditService = { record: jest.fn().mockResolvedValue(undefined) };
+    loginAttemptService = {
+      isAccountLocked: jest.fn().mockResolvedValue(false),
+      recordFailure: jest.fn().mockResolvedValue(undefined),
+      reset: jest.fn().mockResolvedValue(undefined),
+    };
     redis = {
       scan: jest.fn().mockResolvedValue(['0', []]),
       del: jest.fn().mockResolvedValue(0),
@@ -47,6 +60,7 @@ describe('AuthService two-factor authentication', () => {
         AuthService,
         AuthSessionService,
         TwoFactorService,
+        { provide: LoginAttemptService, useValue: loginAttemptService },
         { provide: AuditService, useValue: auditService },
         { provide: getModelToken(AppSetting), useValue: settingModel },
         { provide: getConnectionToken(), useValue: sequelize },
@@ -92,6 +106,41 @@ describe('AuthService two-factor authentication', () => {
       expect(request.session.authenticatedAt).toBe(now);
       expect(request.session.username).toBe('admin');
       expect(save).toHaveBeenCalledTimes(1);
+      expect(loginAttemptService.reset).toHaveBeenCalledWith('admin');
+    });
+
+    it('records an account failure for an invalid password', async () => {
+      settingModel.findOne
+        .mockResolvedValueOnce({ value: { username: 'admin' } })
+        .mockResolvedValueOnce({
+          value: { hash: await bcrypt.hash('correct-password', 4) },
+        });
+      const request = createRequest();
+
+      await expect(
+        service.login(
+          { username: 'admin', password: 'invalid-password' },
+          request,
+        ),
+      ).rejects.toThrow('Invalid username or password');
+
+      expect(loginAttemptService.recordFailure).toHaveBeenCalledWith(
+        'admin',
+        '127.0.0.1',
+      );
+    });
+
+    it('throws 429 before loading credentials when the account is locked', async () => {
+      loginAttemptService.isAccountLocked.mockResolvedValueOnce(true);
+
+      await expect(
+        service.login(
+          { username: 'admin', password: 'password' },
+          createRequest(),
+        ),
+      ).rejects.toMatchObject({ status: HttpStatus.TOO_MANY_REQUESTS });
+
+      expect(settingModel.findOne).not.toHaveBeenCalled();
     });
   });
 

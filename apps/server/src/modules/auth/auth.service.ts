@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -9,6 +14,7 @@ import { AppSetting } from '@/modules/settings/entities/app-setting.entity';
 
 import { LoginDto } from './dto/login.dto';
 import { TotpCodeDto } from './dto/totp-code.dto';
+import { LoginAttemptService } from './login-attempt.service';
 import { TwoFactorService } from './two-factor.service';
 
 @Injectable()
@@ -16,6 +22,7 @@ export class AuthService {
   constructor(
     private readonly auditService: AuditService,
     private readonly twoFactorService: TwoFactorService,
+    private readonly loginAttemptService: LoginAttemptService,
     @InjectModel(AppSetting) private readonly settingModel: typeof AppSetting,
   ) {}
 
@@ -23,6 +30,13 @@ export class AuthService {
     dto: LoginDto,
     request: Request,
   ): Promise<{ isAuthenticated: true; username: string }> {
+    if (await this.loginAttemptService.isAccountLocked(dto.username)) {
+      throw new HttpException(
+        'Too many failed attempts',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
     const adminUsernameSetting = await this.settingModel.findOne({
       where: { key: 'admin_username' },
     });
@@ -47,6 +61,7 @@ export class AuthService {
         sessionId: request.sessionID ?? null,
         newValue: { username: dto.username },
       });
+      await this.loginAttemptService.recordFailure(dto.username, request.ip ?? 'unknown');
       throw new UnauthorizedException('Invalid username or password');
     }
 
@@ -63,6 +78,7 @@ export class AuthService {
           sessionId: request.sessionID ?? null,
           newValue: { username: dto.username, reason: 'invalid_totp' },
         });
+        await this.loginAttemptService.recordFailure(dto.username, request.ip ?? 'unknown');
         throw new UnauthorizedException(
           'Invalid two-factor authentication code',
         );
@@ -74,6 +90,7 @@ export class AuthService {
     request.session.authenticatedAt = Date.now();
     request.session.username = adminUsername;
     await this.saveSession(request);
+    await this.loginAttemptService.reset(dto.username);
 
     await this.auditService.record({
       action: AuditAction.Login,

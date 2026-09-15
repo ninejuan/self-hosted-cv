@@ -149,6 +149,22 @@ class EnvironmentVariables {
   @Min(1)
   LOGIN_LOCKOUT_DURATION!: number;
 
+  @IsString()
+  @IsOptional()
+  AUTH_FAIL_HMAC_KEY?: string;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  AUTH_ACCOUNT_MAX_FAILURES = 50;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  AUTH_ACCOUNT_WINDOW = 900;
+
   @Transform(({ value }) => Number(value))
   @IsInt()
   @Min(1)
